@@ -1,0 +1,1232 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <title>PT. Tirta Teknosys | V10.3 Ultimate (Word Integrated)</title>
+    
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts-d-gstatic-d-com-s-gmn.pixivcn.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    
+    <link href="https://cdn.quilljs.com/1.3.6/quill.snow.css" rel="stylesheet">
+    
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+
+    <style>
+        /* --- TEMA TERANG & GELAP --- */
+        :root {
+            --primary: #0284c7; --primary-light: #38bdf8; --success: #16a34a; --danger: #dc2626; --warning: #eab308;
+            --bg-color: #f8fafc; --card-bg: #ffffff; --text-main: #0f172a; --text-muted: #64748b;
+            --border-color: #e2e8f0; --hover-bg: #f0f9ff; --shadow: rgba(15, 23, 42, 0.08);
+        }
+        body.dark-mode {
+            --primary: #38bdf8; --primary-light: #7dd3fc; --success: #22c55e; --danger: #ef4444; --warning: #facc15;
+            --bg-color: #0f172a; --card-bg: #1e293b; --text-main: #f8fafc; --text-muted: #94a3b8;
+            --border-color: #334155; --hover-bg: #0f172a; --shadow: rgba(0, 0, 0, 0.5);
+        }
+
+        body { font-family: 'Plus Jakarta Sans', sans-serif; background-color: var(--bg-color); margin: 0; padding: 15px; display: flex; flex-direction: column; align-items: center; min-height: 100vh; color: var(--text-main); user-select: none; transition: all 0.3s ease; -webkit-tap-highlight-color: transparent; }
+        .container { background-color: var(--card-bg); width: 100%; max-width: 850px; padding: 30px; border-radius: 20px; box-shadow: 0 15px 35px var(--shadow); position: relative; margin-bottom: 20px; border: 1px solid var(--border-color); box-sizing: border-box; }
+        .hidden { display: none !important; }
+        h1, h2, h3, h4 { margin-top: 0; font-weight: 700; letter-spacing: -0.5px; }
+
+        /* --- WIDGETS --- */
+        .theme-toggle { position: absolute; top: 20px; right: 20px; background: var(--hover-bg); border: 1px solid var(--border-color); color: var(--text-main); width: 40px; height: 40px; border-radius: 50%; cursor: pointer; display: flex; justify-content: center; align-items: center; font-size: 18px; transition: 0.3s; z-index: 10; }
+        
+        #webcam-container { position: fixed; bottom: 20px; right: 20px; width: 110px; height: 140px; border-radius: 12px; overflow: hidden; box-shadow: 0 10px 20px rgba(0,0,0,0.5); border: 3px solid var(--success); z-index: 1000; display: none; background: #000; transition: border-color 0.3s;}
+        #webcam-feed { width: 100%; height: 100%; object-fit: cover; transform: scaleX(-1); }
+        .webcam-label { position: absolute; bottom: 5px; left: 0; width: 100%; text-align: center; color: white; font-size: 10px; font-weight: bold; background: rgba(0,0,0,0.6); padding: 3px 0; transition: background 0.3s;}
+        .ai-warning { border-color: var(--danger) !important; }
+        .ai-warning .webcam-label { background: var(--danger) !important; animation: blink 1s infinite; }
+        @keyframes blink { 0% {opacity: 1;} 50% {opacity: 0.5;} 100% {opacity: 1;} }
+
+        #calc-widget { position: fixed; bottom: 80px; left: 20px; background: var(--card-bg); border: 1px solid var(--border-color); border-radius: 16px; padding: 15px; box-shadow: 0 10px 30px var(--shadow); z-index: 999; display: none; width: 220px; }
+        .calc-display { width: 100%; height: 40px; margin-bottom: 10px; border-radius: 8px; border: 1px solid var(--border-color); background: var(--bg-color); color: var(--text-main); text-align: right; padding: 5px 10px; font-size: 18px; font-weight: bold; box-sizing: border-box;}
+        .calc-keys { display: grid; grid-template-columns: repeat(4, 1fr); gap: 5px; }
+        .calc-btn { background: var(--hover-bg); border: 1px solid var(--border-color); color: var(--text-main); border-radius: 8px; padding: 10px 0; font-size: 16px; font-weight: bold; cursor: pointer;}
+        .calc-btn.op { background: var(--primary-light); color: white; border: none; }
+        #toggle-calc-btn { position: fixed; bottom: 20px; left: 20px; background: var(--primary); color: white; border: none; border-radius: 50%; width: 50px; height: 50px; font-size: 20px; box-shadow: 0 4px 10px var(--shadow); cursor: pointer; z-index: 998; display: none;}
+
+        /* --- UI UMUM --- */
+        .header-logos { display: flex; justify-content: center; align-items: center; margin-bottom: 15px; padding-top: 10px;}
+        .brand-logo { text-align: center; margin-bottom: 25px; }
+        .form-group { margin-bottom: 15px; width: 100%;}
+        .form-group label { display: block; margin-bottom: 6px; color: var(--text-muted); font-weight: 600; font-size: 13px; }
+        .form-group input, .form-group select, .form-group textarea { width: 100%; padding: 12px; border: 1.5px solid var(--border-color); border-radius: 10px; box-sizing: border-box; font-size: 14px; background: var(--card-bg); color: var(--text-main); font-family: inherit; transition: 0.3s;}
+        .form-group input:focus, .form-group select:focus, .form-group textarea:focus { outline: none; border-color: var(--primary-light); box-shadow: 0 0 0 3px rgba(56, 189, 248, 0.2); }
+        
+        .btn { padding: 14px; border: none; border-radius: 12px; cursor: pointer; font-size: 15px; font-weight: 700; transition: all 0.2s; width: 100%; display: flex; justify-content: center; align-items: center; gap: 8px; box-sizing: border-box; }
+        .btn-primary { background: linear-gradient(135deg, var(--primary) 0%, var(--primary-light) 100%); color: white; }
+        .btn-success { background: linear-gradient(135deg, #16a34a 0%, var(--success) 100%); color: white; }
+        .btn-warning { background: var(--warning); color: #fff; }
+        .btn-danger { background: var(--danger); color: #fff; }
+        .btn-outline { background: transparent; border: 2px solid var(--border-color); color: var(--text-muted); }
+        .btn-outline:hover { background: var(--hover-bg); }
+
+        .auth-tabs { display: flex; gap: 10px; margin-bottom: 20px; background: var(--hover-bg); padding: 5px; border-radius: 12px; border: 1px solid var(--border-color); }
+        .auth-tab { flex: 1; padding: 10px; text-align: center; font-weight: 700; cursor: pointer; border-radius: 8px; color: var(--text-muted); font-size: 14px;}
+        .auth-tab.active { background: var(--card-bg); color: var(--primary); box-shadow: 0 2px 5px var(--shadow); }
+
+        /* --- DASHBOARD --- */
+        .dash-header { display: flex; justify-content: flex-start; align-items: center; border-bottom: 2px solid var(--border-color); padding-bottom: 15px; margin-bottom: 20px; gap: 20px; padding-right: 50px; }
+        .user-profile { display: flex; align-items: center; gap: 12px; }
+        .avatar { width: 40px; height: 40px; background: rgba(2, 132, 199, 0.1); color: var(--primary-light); border-radius: 50%; display: flex; justify-content: center; align-items: center; font-size: 18px; overflow: hidden;}
+        
+        .hero-banner { background: linear-gradient(135deg, var(--primary) 0%, var(--primary-light) 100%); border-radius: 16px; padding: 25px; color: white; margin-bottom: 20px; position: relative; overflow: hidden; }
+        .stats-grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 10px; margin-bottom: 20px; }
+        .stat-card { background: var(--hover-bg); padding: 12px; border-radius: 12px; border: 1px solid var(--border-color); display: flex; align-items: center; gap: 10px; }
+        .stat-icon { width: 35px; height: 35px; border-radius: 8px; background: var(--card-bg); display: flex; justify-content: center; align-items: center; color: var(--primary-light); font-size: 16px;}
+        .stat-info h4 { margin: 0; font-size: 16px; } .stat-info p { margin: 0; font-size: 11px; color: var(--text-muted); font-weight: 600;}
+        
+        .test-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 15px; }
+        .test-card { border: 2px solid var(--border-color); border-radius: 16px; padding: 20px 15px; text-align: center; background: var(--card-bg); cursor: pointer; transition: 0.2s; }
+        .test-card:active { transform: scale(0.98); border-color: var(--primary-light); }
+        .module-list { display: flex; flex-direction: column; gap: 10px; }
+        .module-item { background: var(--card-bg); border: 1px solid var(--border-color); padding: 15px; border-radius: 12px; display: flex; justify-content: space-between; align-items: center; }
+        .question-image { max-width: 100%; height: auto; border-radius: 8px; margin-bottom: 15px; box-shadow: 0 4px 6px var(--shadow); }
+
+        /* --- AREA UJIAN --- */
+        .test-header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 15px; padding-right: 50px; }
+        .timer-box { background: rgba(220, 38, 38, 0.1); color: var(--danger); padding: 6px 12px; border-radius: 8px; font-weight: 800; font-size: 15px;}
+        
+        .q-grid-container { background: var(--hover-bg); border: 1px solid var(--border-color); padding: 15px; border-radius: 12px; margin-bottom: 20px; }
+        .q-grid { display: flex; flex-wrap: wrap; gap: 8px; justify-content: center; }
+        .q-box { width: 35px; height: 35px; border-radius: 8px; border: 2px solid var(--border-color); background: var(--card-bg); display: flex; justify-content: center; align-items: center; font-weight: bold; cursor: pointer; color: var(--text-main); font-size: 14px; transition: 0.2s;}
+        .q-box.active { border-color: var(--primary-light); transform: scale(1.1); box-shadow: 0 4px 10px rgba(56, 189, 248, 0.3); z-index: 2;}
+        .q-box.answered { background: var(--primary); color: white; border-color: var(--primary); }
+        .q-box.doubt { background: var(--warning); color: white; border-color: var(--warning); }
+        
+        .question-card { background: var(--card-bg); border: 1px solid var(--border-color); border-radius: 16px; padding: 20px; min-height: 200px; }
+        .options label { display: flex; align-items: center; gap: 12px; margin-bottom: 10px; padding: 14px; background: var(--hover-bg); border-radius: 12px; cursor: pointer; border: 2px solid transparent; font-weight: 600; font-size: 14px;}
+        .options input[type="radio"] { width: 20px; height: 20px; accent-color: var(--primary-light); flex-shrink: 0;}
+
+        .navigation-buttons { display: flex; justify-content: space-between; align-items: center; margin-top: 20px; gap: 10px; }
+        .nav-btn-group { display: flex; gap: 10px; flex: 1; }
+        .btn-secondary { background: var(--hover-bg); color: var(--text-main); border: 1px solid var(--border-color);}
+        .toggle-ragu-btn { display: flex; align-items: center; justify-content: center; gap: 5px; flex: 1; background: var(--card-bg); border: 2px solid var(--warning); color: var(--warning); border-radius: 12px; font-weight: bold; font-size: 14px; cursor: pointer; transition: 0.2s;}
+        .toggle-ragu-btn.active { background: var(--warning); color: white; }
+        .toggle-ragu-btn input { display: none; }
+
+        /* --- ADMIN, HASIL & SETTINGS --- */
+        .score-circle { width: 120px; height: 120px; border-radius: 50%; background: var(--card-bg); border: 8px solid var(--border-color); display: flex; align-items: center; justify-content: center; font-size: 40px; font-weight: 800; margin: 20px auto; color: var(--text-main); }
+        .status-badge { display: inline-block; padding: 8px 20px; border-radius: 20px; font-size: 16px; font-weight: 800; color: white;}
+        .badge-lulus { background: linear-gradient(135deg, #16a34a 0%, #22c55e 100%); } 
+        .badge-gagal { background: linear-gradient(135deg, #dc2626 0%, #ef4444 100%); }
+        
+        .table-wrapper { width: 100%; overflow-x: auto; border-radius: 10px; border: 1px solid var(--border-color); margin-bottom: 20px;}
+        table { width: 100%; border-collapse: collapse; font-size: 12px; color: var(--text-main); min-width: 600px;}
+        th, td { border-bottom: 1px solid var(--border-color); padding: 10px; text-align: left; }
+        th { background-color: var(--primary); color: white; font-weight: 600; white-space: nowrap;}
+        
+        .admin-nav { display: flex; gap: 10px; margin-bottom: 20px; border-bottom: 2px solid var(--border-color); padding-bottom: 10px; overflow-x: auto;}
+        .admin-tab { padding: 10px 15px; background: var(--card-bg); border: 1px solid var(--border-color); border-radius: 8px; cursor: pointer; font-weight: bold; color: var(--text-muted); white-space: nowrap; font-size: 13px;}
+        .admin-tab.active { background: var(--primary); color: white; border-color: var(--primary);}
+        .chart-container { width: 100%; max-width: 400px; margin: 0 auto 20px; background: var(--card-bg); padding: 20px; border-radius: 16px; border: 1px solid var(--border-color); }
+        
+        .cms-form { background: var(--hover-bg); padding: 20px; border-radius: 12px; border: 1px solid var(--border-color); margin-bottom: 20px;}
+        .cms-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 15px; }
+
+        .question-list-item { background: var(--card-bg); border: 1px solid var(--border-color); padding: 10px 15px; border-radius: 8px; margin-bottom: 10px; display: flex; justify-content: space-between; align-items: center; font-size: 13px;}
+
+        /* --- SINKRONISASI LIVE (EFEK NGEDIP SEBELUM RE-RENDER) --- */
+        .live-blink-effect { animation: blinkAnim 0.5s ease-in-out; }
+        @keyframes blinkAnim { 0% { opacity: 1; } 50% { opacity: 0.3; } 100% { opacity: 1; } }
+
+        /* Modifikasi untuk Toolbar Quill di Dark Mode agar tetap rapi */
+        body.dark-mode .ql-toolbar { background: var(--hover-bg); border-color: var(--border-color); }
+        body.dark-mode .ql-toolbar button { filter: invert(1); }
+
+        @media(max-width: 768px) {
+            .stats-grid, .test-grid, .cms-grid { grid-template-columns: 1fr; }
+            .dash-header { flex-direction: column; align-items: flex-start; gap: 15px; padding-right: 0;}
+            .dash-header .btn-outline { align-self: flex-end; margin-top: -45px; }
+            .navigation-buttons { flex-direction: column; } .nav-btn-group { width: 100%; } .toggle-ragu-btn { width: 100%; padding: 14px 0; }
+        }
+
+        #certificate-print { display: none; }
+        @media print {
+            body * { visibility: hidden; } body { background: white; }
+            #certificate-print { display: block; visibility: visible; position: absolute; left: 0; top: 0; width: 100%; height: 100%; text-align: center; border: 15px solid #0284c7; padding: 40px; box-sizing: border-box; background: white; }
+            #certificate-print * { visibility: visible; }
+            #certificate-print h1 { font-size: 40px; color: #0284c7; margin-bottom: 10px;}
+            .cert-score { font-size: 50px; font-weight: bold; color: #16a34a; margin: 20px 0;}
+        }
+        
+        .loader { border: 4px solid var(--border-color); border-top: 4px solid var(--primary); border-radius: 50%; width: 20px; height: 20px; animation: spin 1s linear infinite; display: none; margin: 0 auto;}
+        @keyframes spin { 0% { transform: rotate(0deg); } 100% { transform: rotate(360deg); } }
+    </style>
+</head>
+<body>
+
+<button id="toggle-calc-btn" onclick="toggleCalc()"><i class="fa-solid fa-calculator"></i></button>
+<div id="calc-widget">
+    <input type="text" class="calc-display" id="calc-display" disabled value="0">
+    <div class="calc-keys">
+        <button class="calc-btn" onclick="calcInput('7')">7</button><button class="calc-btn" onclick="calcInput('8')">8</button><button class="calc-btn" onclick="calcInput('9')">9</button><button class="calc-btn op" onclick="calcInput('/')">÷</button>
+        <button class="calc-btn" onclick="calcInput('4')">4</button><button class="calc-btn" onclick="calcInput('5')">5</button><button class="calc-btn" onclick="calcInput('6')">6</button><button class="calc-btn op" onclick="calcInput('*')">×</button>
+        <button class="calc-btn" onclick="calcInput('1')">1</button><button class="calc-btn" onclick="calcInput('2')">2</button><button class="calc-btn" onclick="calcInput('3')">3</button><button class="calc-btn op" onclick="calcInput('-')">-</button>
+        <button class="calc-btn" onclick="calcClear()" style="color:var(--danger);">C</button><button class="calc-btn" onclick="calcInput('0')">0</button><button class="calc-btn op" onclick="calcEval()">=</button><button class="calc-btn op" onclick="calcInput('+')">+</button>
+    </div>
+</div>
+
+<div class="container" id="main-container">
+    <button class="theme-toggle" onclick="toggleTheme()" id="theme-btn"><i class="fa-solid fa-moon"></i></button>
+    
+    <div id="auth-section" class="hidden">
+        <div class="header-logos">
+            <img src="https://i.ibb.co.com/4RWMGX0P/logo-tanpa-background-png.png" alt="PT Tirta Teknosys" style="height: 65px; width: auto; object-fit: contain; filter: drop-shadow(0 0 5px rgba(255,255,255,0.2));" onerror="this.style.display='none';">
+        </div>
+        <div class="brand-logo"><h2 style="color: var(--text-main); font-size: 18px; margin-bottom: 5px;">DASHBOARD UJIAN TEKNISI & PRODUKSI</h2></div>
+        
+        <div class="auth-tabs"><div class="auth-tab active" id="tab-login" onclick="gantiTabAuth('login')">Masuk</div><div class="auth-tab" id="tab-register" onclick="gantiTabAuth('register')">Daftar Akun</div></div>
+
+        <div class="form-group hidden" id="form-nama"><label>Nama Lengkap (KTP)</label><input type="text" id="input-nama" placeholder="Ketik di sini..."></div>
+        
+        <div class="form-group hidden" id="form-divisi">
+            <label>Pilih Divisi Pekerjaan</label>
+            <select id="input-divisi">
+                <option value="produksi">Divisi Produksi</option>
+                <option value="teknisi hospital">Teknisi Hospital</option>
+                <option value="teknisi irescom">Teknisi Irescom</option>
+                <option value="teknisi E-catalog">Teknisi E-Catalog</option>
+            </select>
+        </div>
+        
+        <div class="form-group"><label>Alamat Email</label><input type="email" id="input-email" placeholder="contoh: budi@mail.com" onkeypress="if(event.key === 'Enter') prosesAuth()"></div>
+        <div class="form-group"><label>Kata Sandi</label><input type="password" id="input-password" placeholder="Minimal 6 karakter..." onkeypress="if(event.key === 'Enter') prosesAuth()"></div>
+        
+        <div class="loader" id="auth-loader"></div>
+        <button class="btn btn-primary" id="btn-auth" onclick="prosesAuth()">Masuk Portal <i class="fa-solid fa-arrow-right-to-bracket"></i></button>
+        <div style="text-align: center; margin: 15px 0; color: var(--text-muted); font-size: 12px; font-weight: bold; position: relative;"><hr style="border: 0; border-top: 1px solid var(--border-color); position: absolute; top: 50%; width: 100%; z-index: 1;"><span style="background: var(--card-bg); padding: 0 10px; position: relative; z-index: 2;">ATAU</span></div>
+        <button class="btn btn-outline" style="margin-bottom: 15px;" onclick="loginGoogle()"><i class="fa-brands fa-google" style="color: #ea4335;"></i> Masuk dengan Google</button>
+        <div style="text-align: center;"><a href="#" style="color: var(--text-muted); font-size: 12px; font-weight: bold;" onclick="loginAdmin()">🔑 Panel HRD Admin</a></div>
+    </div>
+
+    <div id="admin-section" class="hidden">
+        <div class="dash-header">
+            <div><h2 style="margin:0; color: var(--primary-light);">Panel HR Cloud V10.3</h2><p style="margin:0; font-size: 12px;">Auto-Rank & Word Integrated Bank</p></div>
+            <button class="btn btn-outline" style="width: auto; padding: 6px 12px; font-size:12px; border:none; color:var(--danger);" onclick="keluarAdmin()">
+                <i class="fa-solid fa-right-from-bracket"></i> Keluar Panel
+            </button>
+        </div>
+        
+        <div class="admin-nav">
+            <div class="admin-tab active" id="tab-adm-data" onclick="gantiTabAdmin('data')"><i class="fa-solid fa-table"></i> Laporan</div>
+            <div class="admin-tab" id="tab-adm-online" onclick="gantiTabAdmin('online')"><i class="fa-solid fa-wifi"></i> Online</div>
+            <div class="admin-tab" id="tab-adm-chart" onclick="gantiTabAdmin('chart')"><i class="fa-solid fa-chart-pie"></i> Analitik</div>
+            <div class="admin-tab" id="tab-adm-cms" onclick="gantiTabAdmin('cms')"><i class="fa-solid fa-pen-to-square"></i> Bank Soal</div>
+            <div class="admin-tab" id="tab-adm-materi" onclick="gantiTabAdmin('materi')"><i class="fa-solid fa-book-bookmark"></i> Materi CMS</div>
+            <div class="admin-tab" id="tab-adm-settings" onclick="gantiTabAdmin('settings')"><i class="fa-solid fa-gear"></i> Pengaturan</div>
+        </div>
+
+        <div id="adm-view-data">
+            <button class="btn btn-success" style="margin-bottom: 15px; width: auto; font-size: 13px;" onclick="eksporCSV()"><i class="fa-solid fa-file-csv"></i> Unduh Laporan Excel/CSV</button>
+            <div class="table-wrapper">
+                <table>
+                    <thead><tr><th>Kandidat</th><th>Modul Ujian</th><th>Skor</th><th>Status</th><th>Device & Waktu</th><th>Aksi</th></tr></thead>
+                    <tbody id="admin-table-body"><tr><td colspan="6" align="center">Memuat data dari Firebase...</td></tr></tbody>
+                </table>
+            </div>
+            <p style="font-size: 11px; color: var(--success);"><i class="fa-solid fa-circle-check"></i> <i>Tabel diurutkan otomatis dari Nilai Tertinggi.</i></p>
+            <button class="btn btn-outline" onclick="hapusSemuaData()" style="color: var(--danger); font-size: 12px; width: auto; margin-top: 10px;"><i class="fa-solid fa-trash-can"></i> Kosongkan Semua Rekap</button>
+        </div>
+
+        <div id="adm-view-online" class="hidden">
+            <h3 style="font-size: 15px;"><i class="fa-solid fa-tower-broadcast" style="color:var(--success);"></i> Pengguna Sedang Aktif</h3>
+            <div class="table-wrapper">
+                <table>
+                    <thead><tr><th>Nama Lengkap</th><th>Divisi</th><th>Waktu Aktivitas</th></tr></thead>
+                    <tbody id="admin-table-online"><tr><td colspan="3" align="center">Memuat data online...</td></tr></tbody>
+                </table>
+            </div>
+        </div>
+
+        <div id="adm-view-chart" class="hidden">
+            <div class="chart-container">
+                <h3 style="text-align: center; font-size: 14px; margin-bottom: 10px;">Rasio Kelulusan Evaluasi</h3>
+                <canvas id="passFailChart"></canvas>
+            </div>
+        </div>
+
+        <div id="adm-view-cms" class="hidden">
+            <div class="cms-form">
+                <h3 style="font-size: 15px; margin-bottom: 15px;"><i class="fa-solid fa-cloud-arrow-up"></i> Kelola Soal Evaluasi</h3>
+                <div class="cms-grid">
+                    <div class="form-group">
+                        <label>Pilih Divisi Ujian</label>
+                        <select id="cms-kategori" onchange="renderDaftarModulCMS()">
+                            <option value="produksi">Divisi Produksi</option>
+                            <option value="teknisi hospital">Teknisi Hospital</option>
+                            <option value="teknisi irescom">Teknisi Irescom</option>
+                            <option value="teknisi E-catalog">Teknisi E-Catalog</option>
+                        </select>
+                    </div>
+                    
+                    <div class="form-group">
+                        <label>Pilih / Ketik Nama Modul</label>
+                        <input type="text" id="cms-modul" list="cms-modul-list" placeholder="Pilih modul atau buat baru..." autocomplete="off" onchange="renderDaftarSoalCMS()">
+                        <datalist id="cms-modul-list"></datalist>
+                    </div>
+                </div>
+                
+                <div class="form-group"><label>Pertanyaan</label><input type="text" id="cms-q" placeholder="Ketik pertanyaan..."></div>
+                <div class="form-group"><label>URL Gambar (Opsional)</label><input type="text" id="cms-img" placeholder="Masukkan URL Link Gambar (Mendukung .png, .jpg)..."></div>
+                <div class="cms-grid">
+                    <div class="form-group"><label>Opsi A</label><input type="text" id="cms-opt0" placeholder="Pilihan 1"></div>
+                    <div class="form-group"><label>Opsi B</label><input type="text" id="cms-opt1" placeholder="Pilihan 2"></div>
+                    <div class="form-group"><label>Opsi C</label><input type="text" id="cms-opt2" placeholder="Pilihan 3"></div>
+                    <div class="form-group"><label>Opsi D</label><input type="text" id="cms-opt3" placeholder="Pilihan 4"></div>
+                </div>
+                <div class="form-group"><label>Kunci Jawaban Benar</label>
+                    <select id="cms-ans"><option value="0">Opsi A</option><option value="1">Opsi B</option><option value="2">Opsi C</option><option value="3">Opsi D</option></select>
+                </div>
+                
+                <div style="display:flex; gap:10px;">
+                    <button class="btn btn-primary" id="btn-simpan-soal" onclick="simpanSoalBaru()"><i class="fa-solid fa-upload"></i> Publikasi ke Cloud</button>
+                    <button class="btn btn-outline hidden" id="btn-batal-edit-soal" onclick="batalEditSoal()">Batal Edit</button>
+                </div>
+            </div>
+
+            <div style="margin-top: 20px; padding-top: 15px; border-top: 1px dashed var(--border-color);">
+                <label style="font-size: 13px; font-weight: bold; color: var(--text-main);">Atau Upload Massal via File CSV:</label>
+                <div style="display: flex; gap: 10px; margin-top: 8px;">
+                    <input type="file" id="cms-csv-file" accept=".csv" style="flex: 1; padding: 8px; border: 1.5px solid var(--border-color); border-radius: 10px; background: var(--card-bg); color: var(--text-main);">
+                    <button class="btn btn-warning" style="width: auto; padding: 10px 15px; font-size: 13px;" onclick="importCSVSoal()">
+                        <i class="fa-solid fa-file-csv"></i> Import CSV
+                    </button>
+                </div>
+                <p style="font-size: 11px; color: var(--text-muted); margin-top: 8px;">
+                    <i class="fa-solid fa-circle-info"></i> Format kolom: Pertanyaan, URL_Gambar, OpsiA, OpsiB, OpsiC, OpsiD, IndexJawaban(0-3)
+                </p>
+            </div>
+            
+            <div class="cms-form" style="background: var(--card-bg);">
+                <h3 style="font-size: 15px; margin-bottom: 15px;"><i class="fa-solid fa-list-check"></i> Daftar Soal pada Modul Terpilih</h3>
+                <div id="cms-daftar-soal">Pilih Divisi dan Modul untuk melihat soal...</div>
+            </div>
+            
+            <div style="border-top: 1px solid var(--border-color); margin-top: 20px; padding-top: 20px;">
+                <h3 style="font-size: 15px; color: var(--danger);"><i class="fa-solid fa-triangle-exclamation"></i> Zona Pemulihan</h3>
+                <button class="btn btn-warning" style="width: auto; font-size: 13px;" onclick="restoreDefaultBankSoal()"><i class="fa-solid fa-rotate-left"></i> Restore 6 Modul Utama (Termasuk 12 Soal Word) ke Server</button>
+            </div>
+        </div>
+
+        <div id="adm-view-materi" class="hidden">
+            <div class="cms-form">
+                <h3 style="font-size: 15px; margin-bottom: 15px;"><i class="fa-solid fa-file-circle-plus"></i> Kelola Materi Pembelajaran</h3>
+                <div class="form-group">
+                    <label>Pilih Kategori Pembelajaran</label>
+                    <select id="cms-mat-kategori">
+                        <option value="Komponen Panel">Materi Komponen Panel</option>
+                        <option value="Timer Industri">Materi Timer Industri</option>
+                        <option value="Kelistrikan">Materi Kelistrikan</option>
+                        <option value="Konversi Daya">Materi Konversi Daya</option>
+                        <option value="VfD & Softstater">Materi VfD & Softstater</option>
+                        <option value="Instrumentasi">Materi Instrumentasi</option>
+                    </select>
+                </div>
+                <div class="form-group"><label>Judul Sub-Materi</label><input type="text" id="cms-mat-judul" placeholder="Contoh: Pengenalan Wiring Diagram Kontaktor"></div>
+                <div class="form-group"><label>URL Gambar (Opsional)</label><input type="text" id="cms-mat-img" placeholder="Masukkan URL Link Gambar (Mendukung .png, .jpg)..."></div>
+                <div class="form-group"><label>URL Video (Opsional)</label><input type="text" id="cms-mat-vid" placeholder="Masukkan URL Video (MP4 / YouTube embed)..."></div>
+
+                <div class="form-group">
+                    <label>Konten / Ringkasan Materi Lengkap</label>
+                    <div style="background: var(--card-bg); border-radius: 10px; overflow: hidden; border: 1.5px solid var(--border-color);">
+                        <div id="editor-container" style="height: 250px; font-family: 'Plus Jakarta Sans', sans-serif; font-size: 14px; color: var(--text-main);"></div>
+                    </div>
+                </div>
+
+                <div style="display:flex; gap:10px;">
+                    <button class="btn btn-success" id="btn-simpan-materi" onclick="simpanMateriBaru()"><i class="fa-solid fa-save"></i> Upload Materi ke Cloud</button>
+                    <button class="btn btn-outline hidden" id="btn-batal-edit-materi" onclick="batalEditMateri()">Batal Edit</button>
+                </div>
+            </div>
+
+            <div style="margin-top: 20px; padding-top: 15px; border-top: 1px dashed var(--border-color);">
+                <label style="font-size: 13px; font-weight: bold; color: var(--text-main);">Atau Upload Materi Massal via File CSV:</label>
+                <div style="display: flex; gap: 10px; margin-top: 8px;">
+                    <input type="file" id="cms-csv-materi" accept=".csv" style="flex: 1; padding: 8px; border: 1.5px solid var(--border-color); border-radius: 10px; background: var(--card-bg); color: var(--text-main);">
+                    <button class="btn btn-warning" style="width: auto; padding: 10px 15px; font-size: 13px;" onclick="importCSVMateri()">
+                        <i class="fa-solid fa-file-csv"></i> Import CSV Materi
+                    </button>
+                </div>
+                <p style="font-size: 11px; color: var(--text-muted); margin-top: 8px; line-height: 1.5;">
+                    <i class="fa-solid fa-circle-info"></i> <b>Format kolom Excel:</b> Judul Materi, Konten_Teks/HTML, URL_Gambar, URL_Video.<br>
+                    <i>*Sistem otomatis mendeteksi tanda kutip Excel sehingga Anda tetap bisa menggunakan tanda koma (,) di dalam paragraf konten materi Anda.</i>
+                </p>
+            </div>
+
+            <div class="cms-form" style="background: var(--card-bg);">
+                <h3 style="font-size: 15px; margin-bottom: 15px;"><i class="fa-solid fa-book"></i> Pengelola Materi Aktif</h3>
+                <div id="cms-daftar-materi">Memuat daftar materi cloud...</div>
+            </div>
+        </div>
+
+        <div id="adm-view-settings" class="hidden">
+            <div class="cms-form">
+                <h3 style="font-size: 15px; margin-bottom: 15px;"><i class="fa-solid fa-sliders"></i> Pengaturan Sistem Ujian</h3>
+                <div class="form-group"><label>Token Akses Ujian Saat Ini</label><input type="text" id="set-token" placeholder="Contoh: TIRTA2024"></div>
+                <div class="form-group"><label>Durasi Waktu Ujian (Menit)</label><input type="number" id="set-waktu" placeholder="Contoh: 10"></div>
+                <div class="form-group"><label>PIN Login Admin HRD</label><input type="password" id="set-pin" placeholder="Contoh: admin123"></div>
+                <button class="btn btn-success" onclick="simpanPengaturan()"><i class="fa-solid fa-floppy-disk"></i> Simpan Pengaturan Cloud</button>
+            </div>
+        </div>
+    </div>
+
+    <div id="dashboard-section" class="hidden">
+        <div class="dash-header">
+            <div class="user-profile">
+                <div class="avatar" id="avatar-icon"><i class="fa-solid fa-user-tie"></i></div>
+                <div><div style="font-size: 11px; font-weight: 700; text-transform: uppercase;" id="user-divisi-display">KANDIDAT</div>
+                    <div style="display: flex; align-items: center; gap: 10px;">
+                        <div style="font-size: 15px; font-weight: 800;" id="user-name-display">Nama</div>
+                        <button class="btn btn-outline" style="width:auto; padding:4px 8px; font-size:11px; border:none; color:var(--danger); cursor:pointer;" onclick="keluarSistem()"><i class="fa-solid fa-right-from-bracket"></i> Keluar</button>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <div class="hero-banner">
+            <h2 style="font-size: 20px; margin-bottom: 5px;">PT. TIRTA TEKNOSYS | Water Treatment Specialist</h2>
+            <p style="font-size: 12px; margin: 0 0 12px 0;">Sistem Evaluasi Real-time Analytics & Manajemen KPI Operator.</p>
+            <div id="realtime-clock" style="font-size: 12px; font-weight: bold; color: var(--warning); background: rgba(0,0,0,0.2); display: inline-block; padding: 6px 12px; border-radius: 6px;">Memuat waktu...</div>
+        </div>
+        
+        <div class="stats-grid">
+            <div class="stat-card"><div class="stat-icon"><i class="fa-solid fa-robot"></i></div><div class="stat-info"><h4>Aktif</h4><p>AI Proctoring</p></div></div>
+            <div class="stat-card"><div class="stat-icon"><i class="fa-solid fa-stopwatch"></i></div><div class="stat-info"><h4 id="display-waktu-global">10m</h4><p>Waktu Ujian</p></div></div>
+            <div class="stat-card"><div class="stat-icon" style="color:var(--success);"><i class="fa-solid fa-cloud"></i></div><div class="stat-info"><h4 style="color:var(--success);">Tersinkron</h4><p>Server Cloud</p></div></div>
+        </div>
+        
+        <h3 style="font-size: 15px;"><i class="fa-solid fa-pen-clip"></i> Evaluasi Kompetensi</h3>
+        <div class="test-grid">
+            <div class="test-card" onclick="bukaSubKategori('produksi')">
+                <i class="fa-solid fa-industry" style="color:var(--success);"></i>
+                <h3 style="font-size:14px;">Produksi</h3><p style="font-size:11px; color:var(--text-muted);">Alur Kerja Umum & K3</p>
+            </div>
+            <div class="test-card" onclick="bukaSubKategori('teknisi hospital')">
+                <i class="fa-solid fa-hospital" style="color:var(--danger);"></i>
+                <h3 style="font-size:14px;">Teknisi Hospital</h3><p style="font-size:11px; color:var(--text-muted);">Maintenance Medis</p>
+            </div>
+            <div class="test-card" onclick="bukaSubKategori('teknisi irescom')">
+                <i class="fa-solid fa-house-chimney-user" style="color:var(--warning);"></i>
+                <h3 style="font-size:14px;">Teknisi Irescom</h3><p style="font-size:11px; color:var(--text-muted);">Penanganan Lapangan</p>
+            </div>
+            <div class="test-card" onclick="bukaSubKategori('teknisi E-catalog')">
+                <i class="fa-solid fa-desktop" style="color:var(--primary);"></i>
+                <h3 style="font-size:14px;">Teknisi E-Catalog</h3><p style="font-size:11px; color:var(--text-muted);">Sistem & Pengadaan</p>
+            </div>
+        </div>
+
+        <h3 style="font-size: 15px; margin-top:25px;"><i class="fa-solid fa-book-open"></i> Menu Materi Pembelajaran</h3>
+        <div class="test-grid">
+            <div class="test-card" onclick="bukaHalamanMateri()" style="border-color: var(--primary);">
+                <i class="fa-solid fa-book" style="color:var(--primary);"></i>
+                <h3 style="font-size:14px;">Materi Elektrikal</h3>
+            </div>
+            <div class="test-card" style="opacity:0.5; cursor:not-allowed;"><i class="fa-solid fa-lock" style="color:var(--text-muted);"></i><h3 style="font-size:14px;">Coming Soon</h3></div>
+            <div class="test-card" style="opacity:0.5; cursor:not-allowed;"><i class="fa-solid fa-lock" style="color:var(--text-muted);"></i><h3 style="font-size:14px;">Coming Soon</h3></div>
+            <div class="test-card" style="opacity:0.5; cursor:not-allowed;"><i class="fa-solid fa-lock" style="color:var(--text-muted);"></i><h3 style="font-size:14px;">Coming Soon</h3></div>
+        </div>
+    </div>
+
+    <div id="materi-section" class="hidden">
+        <div class="dash-header" style="gap: 15px;">
+            <button class="btn btn-outline" style="width:auto; padding:8px 12px;" onclick="showSection('dashboard-section')"><i class="fa-solid fa-arrow-left"></i> Kembali</button>
+            <div><h2 style="margin:0; font-size:16px; color:var(--primary-light);">Modul Pembelajaran Elektrikal</h2></div>
+        </div>
+        <div class="test-grid" id="materi-grid-container"></div>
+    </div>
+
+    <div id="baca-materi-section" class="hidden">
+        <div class="dash-header" style="gap: 15px;">
+            <button class="btn btn-outline" style="width:auto; padding:8px 12px;" onclick="showSection('materi-section')"><i class="fa-solid fa-arrow-left"></i></button>
+            <div><h2 style="margin:0; font-size:16px; color:var(--primary-light);" id="baca-materi-title">Materi</h2></div>
+        </div>
+        <div class="question-card" style="min-height:auto;">
+            <div id="baca-materi-content" style="font-size:14px; line-height:1.6; color:var(--text-main);"></div>
+        </div>
+    </div>
+
+    <div id="sub-dashboard-section" class="hidden">
+        <div class="dash-header" style="gap: 15px;">
+            <button class="btn btn-outline" style="width:auto; padding:8px 12px;" onclick="showSection('dashboard-section')"><i class="fa-solid fa-arrow-left"></i></button>
+            <div><h2 style="margin:0; font-size:16px;">Modul <span id="label-kategori-utama" style="color:var(--primary-light);"></span></h2></div>
+        </div>
+        <div id="module-container" class="module-list"></div>
+    </div>
+
+    <div id="test-section" class="hidden">
+        <div class="test-header">
+            <div style="background: var(--border-color); border-radius: 10px; height: 8px; margin-bottom: 20px; overflow: hidden; width: 100%;">
+                <div id="progress-bar" style="height: 100%; width: 0%; background: var(--success); transition: width 0.3s ease-in-out;"></div>
+            </div>
+            <h3 id="test-title" style="margin:0; font-size:15px; color:var(--primary-light);">Modul</h3>
+            <div class="timer-box" id="timer-display"><i class="fa-regular fa-clock"></i> 00:00</div>
+        </div>
+        
+        <div class="q-grid-container">
+            <div style="font-size: 11px; font-weight: bold; margin-bottom: 10px; color: var(--text-muted);">NAVIGASI SOAL</div>
+            <div class="q-grid" id="q-grid"></div>
+            <div class="q-legend" style="margin-top:10px; text-align:center; font-size:11px; font-weight:bold;">
+                <span><i class="fa-solid fa-square" style="color:var(--primary);"></i> Dijawab</span> &nbsp;
+                <span><i class="fa-solid fa-square" style="color:var(--warning);"></i> Ragu</span> &nbsp;
+                <span><i class="fa-solid fa-square" style="color:var(--card-bg); border: 1px solid gray;"></i> Kosong</span>
+            </div>
+        </div>
+        
+        <div class="question-card" id="single-question-container"></div>
+        
+        <div class="navigation-buttons">
+            <div class="nav-btn-group">
+                <button class="btn btn-secondary" id="btn-prev" onclick="navigasiSoal(-1)"><i class="fa-solid fa-angle-left"></i> Back</button>
+                <button class="btn btn-primary" id="btn-next" onclick="navigasiSoal(1)">Next <i class="fa-solid fa-angle-right"></i></button>
+            </div>
+            <label class="toggle-ragu-btn" id="label-ragu"><input type="checkbox" id="chk-ragu" onchange="toggleRagu()"> <i class="fa-solid fa-flag"></i> Ragu-Ragu</label>
+        </div>
+        <button class="btn btn-success hidden" id="btn-submit" onclick="konfirmasiSubmit()" style="margin-top: 15px;">Selesai & Kumpulkan <i class="fa-solid fa-check-double"></i></button>
+    </div>
+
+    <div id="result-section" class="hidden" style="text-align: center;">
+        <i class="fa-solid fa-award" style="font-size: 40px; color: var(--text-muted); margin-bottom: 10px;"></i>
+        <h2 style="font-size: 20px;">Evaluasi Selesai</h2>
+        <h4 id="result-modul-name" style="color: var(--primary-light); margin-top: 0;">Modul</h4>
+        
+        <div class="score-circle" id="final-score">0</div>
+        <div id="result-status" class="status-badge">LULUS</div>
+        <p id="result-message" style="margin: 15px 0; font-size:13px;"></p>
+        
+        <div style="display:flex; flex-direction: column; gap:10px;">
+            <button class="btn btn-success hidden" id="btn-cetak-sertifikat" onclick="window.print()"><i class="fa-solid fa-download"></i> Unduh Sertifikat</button>
+            <button class="btn btn-outline" onclick="showSection('dashboard-section')">Selesai & Keluar</button>
+        </div>
+    </div>
+</div>
+
+<div style="text-align: center; color: var(--text-muted); font-size: 11px; margin-top: auto; padding: 10px;">
+    &copy; 2024 PT. TIRTA TEKNOSYS | Water Treatment Specialist
+</div>
+
+<div id="certificate-print">
+    <h1>Sertifikat Kelulusan</h1>
+    <h3 id="cert-name" style="color: #333; font-size:24px;">NAMA</h3>
+    <p>Telah Lulus Kompetensi Modul:</p>
+    <h2 id="cert-module" style="color: #0284c7;">MODUL</h2>
+    <div class="cert-score" id="cert-score-display">100</div>
+    <p><b>KOMPETEN</b></p>
+    <p style="margin-top: 50px; font-size: 14px;"><i>Sertifikat Resmi - PT. Tirta Teknosys HR Department</i></p>
+</div>
+
+<audio id="click-sound" src="https://www.soundjay.com/buttons/sounds/button-16.mp3" preload="auto"></audio>
+<audio id="success-sound" src="https://www.soundjay.com/misc/sounds/bell-ringing-05.mp3" preload="auto"></audio>
+
+<script src="https://cdn.quilljs.com/1.3.6/quill.min.js"></script>
+
+<script type="module">
+    import { initializeApp } from "https://www-d-gstatic-d-com-s-gmn.pixivcn.com/firebasejs/10.8.0/firebase-app.js";
+    import { getDatabase, ref, push, onValue, remove, set, get, update, onDisconnect } from "https://www-d-gstatic-d-com-s-gmn.pixivcn.com/firebasejs/10.8.0/firebase-database.js";
+    import { getAuth, signInWithPopup, GoogleAuthProvider, createUserWithEmailAndPassword, signInWithEmailAndPassword, signOut, onAuthStateChanged, setPersistence, browserLocalPersistence } from "https://www-d-gstatic-d-com-s-gmn.pixivcn.com/firebasejs/10.8.0/firebase-auth.js";
+
+    const firebaseConfig = {
+        apiKey: "AIzaSyBuijZf7fDRNaizSi4ucI0ed_Z6P2Dm6LU",
+        authDomain: "portalevaluasiterpadu.firebaseapp.com",
+        databaseURL: "https://portalevaluasiterpadu-default-rtdb.asia-southeast1.firebasedatabase.app",
+        projectId: "portalevaluasiterpadu",
+        storageBucket: "portalevaluasiterpadu.firebasestorage.app",
+        messagingSenderId: "356139685846",
+        appId: "1:356139685846:web:513a90346c6f9ea5fd3677"
+    };
+
+    const app = initializeApp(firebaseConfig);
+    const db = getDatabase(app);
+    const auth = getAuth(app);
+    const googleProvider = new GoogleAuthProvider();
+
+    // --- VARIABEL GLOBAL ---
+    let currentUser = '', currentDivisi = '', currentMainKategori = '', currentSubModul = '';
+    let ujianSedangBerjalan = [], currentQuestionIndex = 0, timerInterval = null, waktuSisa = 0, pelanggaran = 0, isUjianAktif = false, modeAuth = 'login', webcamStream = null, aiProctorInterval = null;
+    let activeMateriCloud = {};
+    
+    // Variabel Penanda Edit
+    let editSoalIndex = -1;
+    let editMateriKey = null;
+
+    // --- INISIALISASI QUILL RICH TEXT EDITOR ---
+    let quill;
+    document.addEventListener('DOMContentLoaded', () => {
+        quill = new Quill('#editor-container', {
+            theme: 'snow',
+            placeholder: 'Ketik isi materi pembelajaran secara mendalam di sini...',
+            modules: {
+                toolbar: [
+                    [{ 'header': [1, 2, 3, false] }],
+                    ['bold', 'italic', 'underline', 'strike'],        
+                    [{ 'list': 'ordered'}, { 'list': 'bullet' }],
+                    [{ 'color': [] }, { 'background': [] }],          
+                    [{ 'align': [] }],
+                    ['clean'] // Tombol untuk menghapus format teks
+                ]
+            }
+        });
+    });
+
+    document.addEventListener('contextmenu', event => event.preventDefault());
+
+    function toggleTheme() { document.body.classList.toggle('dark-mode'); document.getElementById('theme-btn').innerHTML = document.body.classList.contains('dark-mode') ? '<i class="fa-solid fa-sun"></i>' : '<i class="fa-solid fa-moon"></i>'; }
+    function playClick() { document.getElementById('click-sound').play().catch(()=>{}); }
+    function playSuccess() { document.getElementById('success-sound').play().catch(()=>{}); }
+    function showSection(id) { document.querySelectorAll('#main-container > div').forEach(d => d.classList.add('hidden')); document.getElementById(id).classList.remove('hidden'); window.scrollTo(0,0); }
+    function getDeviceInfo() { let os = "Unknown"; if(navigator.userAgent.indexOf("Win")!==-1)os="Windows"; if(navigator.userAgent.indexOf("Mac")!==-1)os="Mac"; if(navigator.userAgent.indexOf("Android")!==-1)os="Android"; return `${os} (${window.innerWidth <= 768 ? "Mobile" : "Desktop"})`; }
+
+    setInterval(() => {
+        const now = new Date();
+        const clockEl = document.getElementById('realtime-clock');
+        if(clockEl) clockEl.innerText = now.toLocaleDateString('id-ID', { weekday: 'long', year: 'numeric', month: 'long', day: 'numeric', hour: '2-digit', minute: '2-digit', second: '2-digit' });
+    }, 1000);
+
+    let calcVal = '';
+    function toggleCalc() { const c = document.getElementById('calc-widget'); c.style.display = c.style.display === 'block' ? 'none' : 'block'; }
+    function calcInput(char) { calcVal += char; document.getElementById('calc-display').value = calcVal; }
+    function calcClear() { calcVal = ''; document.getElementById('calc-display').value = '0'; }
+    function calcEval() { try { calcVal = eval(calcVal).toString(); document.getElementById('calc-display').value = calcVal; } catch(e) { document.getElementById('calc-display').value = 'Error'; calcVal=''; } }
+
+    function acakArray(array) {
+        for (let i = array.length - 1; i > 0; i--) {
+            const j = Math.floor(Math.random() * (i + 1));
+            [array[i], array[j]] = [array[j], array[i]];
+        }
+        return array;
+    }
+
+    function triggerBlinkEffect() {
+        const container = document.getElementById('main-container');
+        container.classList.add('live-blink-effect');
+        setTimeout(() => container.classList.remove('live-blink-effect'), 400);
+    }
+
+    let appSettings = { token: "TIRTA2024", waktu: 10, pin_admin: "admin123" };
+    onValue(ref(db, 'app_settings'), (snapshot) => {
+        if(snapshot.exists()) {
+            appSettings = snapshot.val();
+            document.getElementById('display-waktu-global').innerText = appSettings.waktu + 'm';
+            document.getElementById('set-token').value = appSettings.token;
+            document.getElementById('set-waktu').value = appSettings.waktu;
+            document.getElementById('set-pin').value = appSettings.pin_admin;
+            if(!document.getElementById('dashboard-section').classList.contains('hidden')) triggerBlinkEffect();
+        } else {
+            set(ref(db, 'app_settings'), appSettings);
+        }
+    });
+
+    const modulListWajib = ["Evaluasi Komponen Panel", "Evaluasi Timer Industri", "Evaluasi Kelistrikan", "Evaluasi Konversi Daya", "Evaluasi VfD & Softstater", "Evaluasi Instrumentasi"];
+    const defaultBankSoal = { "produksi": {}, "teknisi hospital": {}, "teknisi irescom": {}, "teknisi E-catalog": {} };
+    const soalKomponenPanelWord = [
+        { q: "Komponen apa yang berfungsi sebagai saklar elektromagnetik untuk memutus dan menyambungkan arus listrik pada beban berdaya besar seperti motor listrik?", image: "", options: ["Relay AC", "Surge Arrester", "Magnetic Contactor", "Thermal Overload Relay", "Solid State Relay"], answer: 2 },
+        { q: "Kontaktor memiliki beberapa kategori penggunaan berdasarkan jenis bebannya. Kategori yang tepat digunakan untuk menghidupkan dan mematikan motor induksi (Squirrel Cage) secara normal adalah...", image: "", options: ["AC-1", "AC-3", "DC-1", "DC-5", "AC-5"], answer: 1 },
+        { q: "Kontaktor DC dirancang berbeda dengan kontaktor AC. Mengapa memutus arus searah (DC) lebih sulit dan memerlukan arc chute yang lebih besar?", image: "", options: ["Karena arus DC lebih cepat merusak koil.", "Karena arus DC tidak memiliki titik nol (zero crossing) sehingga busur api sulit padam.", "Karena tegangan DC lebih sering naik turun.", "Karena motor DC membutuhkan daya angkat yang lebih ringan.", "Karena arus DC menimbulkan medan magnet yang berlawanan."], answer: 1 },
+        { q: "Thermal Overload Relay (TOR) berfungsi untuk melindungi motor dari panas berlebih akibat arus beban lebih. Komponen internal utama pada TOR yang bertugas mendeteksi panas tersebut adalah...", image: "", options: ["Shading coil", "Metal Oxide Varistor (MOV)", "Semikonduktor / Thyristor", "Elemen Bimetal", "Inti besi (Armature)"], answer: 3 },
+        { q: "Sebuah motor listrik 3 fasa memiliki Arus Nominal (In) atau Full Load Amperage (FLA) sebesar 20 Ampere. Berapakah rentang setting arus yang direkomendasikan pada Thermal Overload Relay (TOR)?", image: "", options: ["15 A - 18 A", "20 A (Sama persis)", "21 A - 22 A", "30 A - 40 A", "40 A - 50 A"], answer: 2 },
+        { q: "Pada TOR terdapat tombol berlabel 'TEST' (biasanya berwarna merah). Fungsi dari tombol tersebut adalah untuk...", image: "", options: ["Me-reset TOR ke pengaturan pabrik.", "Mengukur tegangan yang masuk ke motor.", "Mensimulasikan pergerakan bimetal secara manual untuk menguji apakah kontak kontrol 95-96 berfungsi memutus sirkuit.", "Menghidupkan motor secara langsung tanpa melewati kontaktor.", "Mengaktifkan lampu indikator pada panel."], answer: 2 },
+        { q: "Relay elektromekanik AC memiliki komponen tambahan pada inti besinya untuk mencegah getaran parah (chattering) saat tegangan bolak-balik melewati titik nol. Komponen tersebut dinamakan...", image: "", options: ["Bimetal strip", "Blowout magnet", "Shading ring (Shading coil)", "Arc chute", "Spring return"], answer: 2 },
+        { q: "Solid State Relay (SSR) berbeda dari Electromechanical Relay (EMR) karena SSR...", image: "", options: ["Hanya bisa digunakan untuk arus AC.", "Memiliki kontak tembaga yang lebih tebal.", "Bekerja menggunakan bimetal.", "Tidak memiliki komponen mekanik yang bergerak karena menggunakan semikonduktor.", "Membutuhkan tegangan kontrol ratusan volt."], answer: 3 },
+        { q: "Surge Arrester (SPD) dipasang pada panel distribusi berfungsi untuk...", image: "", options: ["Membatasi pemakaian daya harian.", "Melindungi motor listrik dari beban lebih.", "Menghilangkan getaran pada kontaktor.", "Memotong dan membuang lonjakan tegangan (surge) seperti akibat sambaran petir ke sistem pembumian (grounding).", "Menstabilkan arus listrik secara otomatis setiap saat."], answer: 3 },
+        { q: "Komponen utama di dalam Surge Arrester (SPD) yang hambatannya bisa turun drastis (menjadi konduktor) saat terkena tegangan kejut ekstrem adalah...", image: "", options: ["MOV (Metal Oxide Varistor)", "Shading Ring", "Bimetal", "Kontaktor Koil", "Triac"], answer: 0 },
+        { q: "Pada jendela indikator Surge Arrester (SPD), warna apa yang biasanya menunjukkan bahwa kartrid/modul SPD tersebut sudah rusak dan harus diganti?", image: "", options: ["Hijau", "Merah", "Biru", "Kuning", "Putih"], answer: 1 },
+        { q: "Surge Arrester (SPD) tipe apa yang idealnya dipasang pada panel distribusi utama (MDB) untuk menahan arus petir langsung dari luar ruangan?", image: "", options: ["Type 3 (Class D)", "Type 2 (Class C)", "Type 1 (Class B)", "SPD DC", "Thermal Arrester"], answer: 2 }
+    ];
+
+    Object.keys(defaultBankSoal).forEach(div => {
+        modulListWajib.forEach(modul => {
+            if(modul === "Evaluasi Komponen Panel") {
+                defaultBankSoal[div][modul] = [
+                    { q: "Perhatikan contoh gambar komponen instrumen berikut. Apakah nama tipe pengaman elektrikal tersebut?", image: "https://upload.wikimedia.org/wikipedia/commons/thumb/d/df/MCB_C16.jpg/320px-MCB_C16.jpg", options: ["MCB (Miniature Circuit Breaker)", "Relay AC/DC", "Kontaktor Magnetik", "TDR Timer Relay"], answer: 0 },
+                    ...soalKomponenPanelWord
+                ];
+            } else {
+                defaultBankSoal[div][modul] = [
+                    { q: `Berapakah batas ambang toleransi standar kelayakan pengujian awal pada modul [${modul}]?`, image: "", options: ["Kurang dari parameter", "Sesuai regulasi standar baku mutu PT. Tirta Teknosys", "Dibiarkan tanpa kalkulasi", "Bypass sirkuit manual"], answer: 1 }
+                ];
+            }
+        });
+    });
+
+    let activeBankSoal = defaultBankSoal;
+    onValue(ref(db, 'bank_soal_cloud'), (snapshot) => {
+        if(snapshot.exists()) { 
+            activeBankSoal = snapshot.val(); 
+            renderDaftarModulCMS(); 
+            if(!document.getElementById('test-section').classList.contains('hidden')) triggerBlinkEffect();
+        } else { set(ref(db, 'bank_soal_cloud'), defaultBankSoal); }
+    });
+
+    function restoreDefaultBankSoal() {
+        if(confirm("Kembalikan sistem ke 6 modul elektrikal wajib (termasuk 12 Soal Panel asli dari dokumen Word Anda) di seluruh divisi?")) {
+            set(ref(db, 'bank_soal_cloud'), defaultBankSoal).then(() => { alert("Restorasi Berhasil!"); });
+        }
+    }
+
+    onValue(ref(db, 'materi_pembelajaran_cloud'), (snapshot) => {
+        activeMateriCloud = snapshot.val() || {};
+        if(!document.getElementById('materi-section').classList.contains('hidden')) { renderHalamanMateri(); triggerBlinkEffect(); }
+        if(!document.getElementById('admin-section').classList.contains('hidden')) { renderDaftarMateriCMS(); }
+    });
+
+    setPersistence(auth, browserLocalPersistence).catch((error) => { console.error(error); });
+
+    onAuthStateChanged(auth, (user) => {
+        // 1. CEK SESI ADMIN TERLEBIH DAHULU (ANTI-REFRESH)
+        if (localStorage.getItem('admin_logged_in') === 'true') {
+            muatDataAdminFirebase(); 
+            onValue(ref(db, 'online_users'), (snapshot) => { 
+                const tbody = document.getElementById('admin-table-online'); tbody.innerHTML = ''; 
+                const data = snapshot.val(); 
+                if(!data) { tbody.innerHTML = `<tr><td colspan="3" align="center">Offline</td></tr>`; return; } 
+                for(let key in data) { tbody.innerHTML += `<tr><td><i class="fa-solid fa-circle" style="color:var(--success); font-size:10px;"></i> <b>${data[key].nama}</b></td><td>${data[key].divisi}</td><td>${data[key].waktu}</td></tr>`; } 
+            });
+            showSection('admin-section'); 
+            gantiTabAdmin('data');
+            return;
+        }
+
+        // 2. JIKA BUKAN ADMIN, JALANKAN LOGIKA KANDIDAT NORMAL
+        if (user) {
+            get(ref(db, 'users/' + user.uid)).then((snap) => {
+                if(snap.exists()) { 
+                    currentUser = snap.val().nama; 
+                    currentDivisi = snap.val().divisi; 
+                } else { 
+                    currentUser = user.email.split('@')[0]; 
+                    currentDivisi = "UMUM"; 
+                }
+                document.getElementById('avatar-icon').innerHTML = user.photoURL ? `<img src="${user.photoURL}" style="width:100%; border-radius:50%; object-fit:cover;">` : `<i class="fa-solid fa-user-tie"></i>`;
+                document.getElementById('user-name-display').innerText = currentUser.toUpperCase();
+                document.getElementById('user-divisi-display').innerText = currentDivisi.toUpperCase();
+                
+                if (isUjianAktif) showSection('test-section'); else showSection('dashboard-section');
+                const connectionRef = ref(db, 'online_users/' + user.uid);
+                set(connectionRef, { nama: currentUser, divisi: currentDivisi, waktu: new Date().toLocaleTimeString('id-ID') });
+                onDisconnect(connectionRef).remove();
+            }).catch((err) => {
+                currentUser = user.email ? user.email.split('@')[0] : "User"; currentDivisi = "UMUM"; showSection('dashboard-section'); 
+            });
+        } else { 
+            showSection('auth-section'); 
+        }
+    });
+
+    function gantiTabAuth(mode) {
+        playClick(); modeAuth = mode;
+        document.getElementById('tab-login').classList.toggle('active', mode === 'login');
+        document.getElementById('tab-register').classList.toggle('active', mode === 'register');
+        document.getElementById('form-nama').classList.toggle('hidden', mode === 'login');
+        document.getElementById('form-divisi').classList.toggle('hidden', mode === 'login');
+        document.getElementById('btn-auth').innerHTML = mode === 'login' ? `Masuk Portal <i class="fa-solid fa-arrow-right-to-bracket"></i>` : `Daftar Sekarang <i class="fa-solid fa-user-plus"></i>`;
+    }
+
+    function prosesAuth() {
+        playClick(); let email = document.getElementById('input-email').value; let password = document.getElementById('input-password').value;
+        if(email === '' || password === '') { alert("Email dan Kata Sandi wajib diisi!"); return; }
+        document.getElementById('auth-loader').style.display = 'block'; document.getElementById('btn-auth').style.display = 'none';
+
+        if(modeAuth === 'register') {
+            let nama = document.getElementById('input-nama').value; let divisi = document.getElementById('input-divisi').value;
+            if(nama === '') { alert("Nama wajib diisi!"); resetAuthUI(); return; }
+            createUserWithEmailAndPassword(auth, email, password).then((userCredential) => {
+                set(ref(db, 'users/' + userCredential.user.uid), { nama: nama, email: email, divisi: divisi }).then(() => resetAuthUI());
+            }).catch((err) => { alert("Gagal Daftar: " + err.message); resetAuthUI(); });
+        } else {
+            signInWithEmailAndPassword(auth, email, password).catch((err) => { alert("Login Gagal."); resetAuthUI(); });
+        }
+    }
+    function resetAuthUI() { document.getElementById('auth-loader').style.display = 'none'; document.getElementById('btn-auth').style.display = 'block'; }
+    function loginGoogle() { playClick(); signInWithPopup(auth, googleProvider).catch((err) => alert("Login Gagal")); }
+    function keluarSistem() { playClick(); if(auth.currentUser) remove(ref(db, 'online_users/' + auth.currentUser.uid)); signOut(auth); isUjianAktif = false; matikanKeamanan(); document.getElementById('toggle-calc-btn').style.display = 'none'; document.getElementById('calc-widget').style.display = 'none'; }
+
+    function bukaHalamanMateri() { playClick(); renderHalamanMateri(); showSection('materi-section'); }
+    function renderHalamanMateri() {
+        const container = document.getElementById('materi-grid-container'); container.innerHTML = '';
+        const listKategoriWajib = ["Komponen Panel", "Timer Industri", "Kelistrikan", "Konversi Daya", "VfD & Softstater", "Instrumentasi"];
+        const icons = { "Komponen Panel": "fa-bolt", "Timer Industri": "fa-stopwatch-20", "Kelistrikan": "fa-plug", "Konversi Daya": "fa-car-battery", "VfD & Softstater": "fa-microchip", "Instrumentasi": "fa-gauge" };
+        const colors = { "Komponen Panel": "var(--warning)", "Timer Industri": "var(--primary)", "Kelistrikan": "var(--danger)", "Konversi Daya": "var(--success)", "VfD & Softstater": "gray", "Instrumentasi": "var(--primary-light)" };
+
+        listKategoriWajib.forEach(kat => {
+            let totalMateri = activeMateriCloud[kat] ? Object.keys(activeMateriCloud[kat]).length : 0;
+            container.innerHTML += `
+                <div class="test-card" onclick="bukaDaftarSubMateri('${kat}')" style="border-color:${colors[kat] || 'var(--border-color)'};">
+                    <i class="fa-solid ${icons[kat] || 'fa-book'}" style="color:${colors[kat]};"></i>
+                    <h3 style="font-size:14px;">Materi ${kat}</h3>
+                    <span style="font-size:11px; font-weight:bold; color:white; background:var(--primary); padding:3px 8px; border-radius:10px;">${totalMateri} Sub-Materi</span>
+                </div>`;
+        });
+    }
+
+    function bukaDaftarSubMateri(kategori) {
+        playClick();
+        if(!activeMateriCloud[kategori] || Object.keys(activeMateriCloud[kategori]).length === 0) { alert(`Belum ada sub-materi.`); return; }
+        let listKeys = Object.keys(activeMateriCloud[kategori]);
+        let msg = `Pilih Sub-Materi ${kategori} (Ketik Angka):\n\n`;
+        listKeys.forEach((key, idx) => { msg += `${idx + 1}. ${activeMateriCloud[kategori][key].judul}\n`; });
+        let pil = prompt(msg);
+        
+        if (pil && !isNaN(pil) && pil > 0 && pil <= listKeys.length) {
+            let targetMateri = activeMateriCloud[kategori][listKeys[pil - 1]];
+            document.getElementById('baca-materi-title').innerText = targetMateri.judul;
+            let contentHtml = `<div class="ql-editor" style="padding: 0; margin-bottom: 20px;">${targetMateri.konten}</div>`;
+            if (targetMateri.image) contentHtml += `<img src="${targetMateri.image}" style="max-width: 100%; border-radius: 8px; margin-bottom: 20px; box-shadow: 0 4px 6px var(--shadow);">`;
+            if (targetMateri.video) {
+                if (targetMateri.video.includes('youtube.com') || targetMateri.video.includes('youtu.be')) {
+                    let embedUrl = targetMateri.video.replace("watch?v=", "embed/").replace("youtu.be/", "youtube.com/embed/");
+                    contentHtml += `<iframe width="100%" height="315" src="${embedUrl}" frameborder="0" allowfullscreen style="border-radius: 8px; margin-bottom: 10px;"></iframe>`;
+                } else {
+                    contentHtml += `<video width="100%" controls style="border-radius: 8px; margin-bottom: 10px;"><source src="${targetMateri.video}" type="video/mp4"></video>`;
+                }
+            }
+            document.getElementById('baca-materi-content').innerHTML = contentHtml;
+            showSection('baca-materi-section');
+        }
+    }
+
+    function mulaiKeamanan() { if (document.documentElement.requestFullscreen) document.documentElement.requestFullscreen().catch(()=>{}); }
+    function matikanKeamanan() { if (document.fullscreenElement) document.exitFullscreen().catch(()=>{}); }
+
+    document.addEventListener("visibilitychange", () => {
+        if (document.hidden && isUjianAktif) {
+            pelanggaran++;
+            if (pelanggaran >= 3) { alert("DISKUALIFIKASI! Terlalu sering meninggalkan tab."); submitTest(true); } 
+            else { alert(`PERINGATAN AI (${pelanggaran}/3)!\nDilarang pindah tab/aplikasi! Wajah & layar direkam.`); }
+        }
+    });
+
+    function bukaSubKategori(kat) {
+        playClick(); currentMainKategori = kat; document.getElementById('label-kategori-utama').innerText = kat.toUpperCase();
+        const cont = document.getElementById('module-container'); cont.innerHTML = '';
+        if(activeBankSoal[kat]) {
+            Object.keys(activeBankSoal[kat]).forEach(mod => {
+                cont.innerHTML += `<div class="module-item"><div><b style="font-size:14px;">${mod}</b></div><button class="btn btn-primary" style="width:auto; padding: 10px 15px; font-size:13px;" onclick="cekTokenDanMulai('${mod}')">Mulai Ujian</button></div>`;
+            });
+        }
+        showSection('sub-dashboard-section');
+    }
+
+    function cekTokenDanMulai(mod) {
+        playClick(); let token = prompt("Masukkan Token Akses Ujian:");
+        if(token !== appSettings.token) { alert("Akses Ditolak!"); return; }
+        
+        mulaiKeamanan(); document.getElementById('toggle-calc-btn').style.display = 'block';
+        currentSubModul = mod; document.getElementById('test-title').innerText = mod;
+        let soalAsli = activeBankSoal[currentMainKategori][mod];
+        ujianSedangBerjalan = []; currentQuestionIndex = 0; pelanggaran = 0; isUjianAktif = true;
+
+        soalAsli.forEach(s => {
+            let opsi = s.options.map((t, idx) => ({ teks: t, isBenar: idx === s.answer }));
+            ujianSedangBerjalan.push({ q: s.q, img: s.image, opt: acakArray(opsi), ans: null, ragu: false });
+        });
+        ujianSedangBerjalan = acakArray(ujianSedangBerjalan);
+        
+        renderSoal(); renderGridNavigasi();
+        clearInterval(timerInterval); waktuSisa = appSettings.waktu * 60; 
+        timerInterval = setInterval(() => {
+            let m = Math.floor(waktuSisa/60); let s = waktuSisa%60;
+            let timerEl = document.getElementById('timer-display');
+            timerEl.innerHTML = `<i class="fa-regular fa-clock"></i> ${m}:${s<10?'0':''}${s}`;
+            if (waktuSisa <= 60) { timerEl.style.backgroundColor = "var(--danger)"; timerEl.style.color = "white"; timerEl.style.animation = "blinkAnim 1s infinite"; } 
+            else { timerEl.style.backgroundColor = "rgba(220, 38, 38, 0.1)"; timerEl.style.color = "var(--danger)"; timerEl.style.animation = "none"; }
+            if (--waktuSisa < 0) { alert("Waktu Habis!"); submitTest(); }
+        }, 1000);
+        showSection('test-section');
+    }
+
+    function renderGridNavigasi() {
+        const grid = document.getElementById('q-grid'); grid.innerHTML = '';
+        ujianSedangBerjalan.forEach((soal, idx) => {
+            let cls = 'q-box';
+            if (idx === currentQuestionIndex) cls += ' active';
+            if (soal.ragu) cls += ' doubt'; else if (soal.ans !== null) cls += ' answered';
+            grid.innerHTML += `<div class="${cls}" onclick="lompatSoal(${idx})">${idx + 1}</div>`;
+        });
+    }
+
+    function lompatSoal(idx) { playClick(); simpanAns(); currentQuestionIndex = idx; renderSoal(); }
+    function toggleRagu() { playClick(); let isRagu = document.getElementById('chk-ragu').checked; ujianSedangBerjalan[currentQuestionIndex].ragu = isRagu; document.getElementById('label-ragu').classList.toggle('active', isRagu); renderGridNavigasi(); }
+
+    function renderSoal() {
+        const cont = document.getElementById('single-question-container'); const s = ujianSedangBerjalan[currentQuestionIndex];
+        let imgHtml = s.img ? `<img src="${s.img}" class="question-image" alt="Soal Image" onerror="this.style.display='none'">` : '';
+        let html = `${imgHtml}<p style="font-size:15px;">${currentQuestionIndex + 1}. ${s.q}</p><div class="options">`;
+        s.opt.forEach(o => { html += `<label onclick="playClick()"><input type="radio" name="q_curr" value="${o.isBenar}" ${(s.ans === o.isBenar.toString()) ? "checked" : ""}> ${o.teks}</label>`; });
+        cont.innerHTML = html + `</div>`;
+        document.getElementById('chk-ragu').checked = s.ragu; document.getElementById('label-ragu').classList.toggle('active', s.ragu);
+        document.getElementById('btn-prev').disabled = (currentQuestionIndex === 0); document.getElementById('btn-prev').style.opacity = currentQuestionIndex === 0 ? "0.5" : "1";
+        document.getElementById('btn-next').classList.toggle('hidden', currentQuestionIndex === ujianSedangBerjalan.length - 1);
+        document.getElementById('btn-submit').classList.toggle('hidden', currentQuestionIndex !== ujianSedangBerjalan.length - 1);
+        document.getElementById('progress-bar').style.width = (((currentQuestionIndex + 1) / ujianSedangBerjalan.length) * 100) + '%';
+        renderGridNavigasi();
+    }
+
+    function simpanAns() { const pil = document.querySelector(`input[name="q_curr"]:checked`); if (pil) { ujianSedangBerjalan[currentQuestionIndex].ans = pil.value; } }
+    function navigasiSoal(arah) { playClick(); simpanAns(); currentQuestionIndex += arah; renderSoal(); }
+    function konfirmasiSubmit() { simpanAns(); let rC = 0, kC = 0; ujianSedangBerjalan.forEach(s => { if(s.ragu) rC++; if(s.ans === null) kC++; }); let msg = "Kumpulkan semua jawaban?"; if(kC > 0) msg += `\n${kC} soal kosong!`; if(rC > 0) msg += `\n${rC} soal ragu!`; if(confirm(msg)) submitTest(); }
+
+    function submitTest(isDiskualifikasi = false) {
+        simpanAns(); clearInterval(timerInterval); isUjianAktif = false; matikanKeamanan();
+        document.getElementById('toggle-calc-btn').style.display = 'none'; document.getElementById('calc-widget').style.display = 'none';
+        let benar = 0; ujianSedangBerjalan.forEach(s => { if (s.ans === "true") benar++; });
+        let skor = isDiskualifikasi ? 0 : Math.round((benar / ujianSedangBerjalan.length) * 100) || 0;
+        let isLulus = skor >= 70 && !isDiskualifikasi;
+        if(isLulus) playSuccess();
+        
+        document.getElementById('result-modul-name').innerText = currentSubModul; document.getElementById('final-score').innerText = isDiskualifikasi ? "X" : skor;
+        document.getElementById('final-score').style.color = isLulus ? "var(--success)" : "var(--danger)"; document.getElementById('final-score').style.borderColor = isLulus ? "var(--success)" : "var(--danger)";
+        let status = document.getElementById('result-status'); status.innerText = isDiskualifikasi ? "DISKUALIFIKASI" : (isLulus ? "LULUS" : "GAGAL"); status.className = "status-badge " + (isLulus ? "badge-lulus" : "badge-gagal");
+        document.getElementById('result-message').innerText = isDiskualifikasi ? "Terdeteksi Curang oleh AI." : (isLulus ? "Memenuhi KKM." : "Di bawah KKM.");
+        document.getElementById('btn-cetak-sertifikat').classList.toggle('hidden', !isLulus);
+        if(isLulus) { document.getElementById('cert-name').innerText = currentUser; document.getElementById('cert-module').innerText = currentSubModul; document.getElementById('cert-score-display').innerText = skor; }
+        
+        push(ref(db, 'rekap_evaluasi'), { nama: currentUser, divisi: currentDivisi, ujian: `${currentMainKategori.toUpperCase()} - ${currentSubModul}`, skor: skor, status: isDiskualifikasi ? "DISKUALIFIKASI" : (isLulus ? "LULUS" : "GAGAL"), device: getDeviceInfo(), waktu: new Date().toLocaleTimeString('id-ID') + " " + new Date().toLocaleDateString('id-ID') });
+        showSection('result-section');
+    }
+
+    let rekapDataGlobal = []; let myChart = null;
+    function gantiTabAdmin(tabId) {
+        document.querySelectorAll('.admin-tab').forEach(t => t.classList.remove('active'));
+        document.getElementById('tab-adm-' + tabId).classList.add('active');
+        document.getElementById('adm-view-data').classList.add('hidden'); document.getElementById('adm-view-chart').classList.add('hidden');
+        document.getElementById('adm-view-cms').classList.add('hidden'); document.getElementById('adm-view-settings').classList.add('hidden'); 
+        document.getElementById('adm-view-online').classList.add('hidden'); document.getElementById('adm-view-materi').classList.add('hidden');
+        document.getElementById('adm-view-' + tabId).classList.remove('hidden');
+        if(tabId === 'chart') renderChart(); if(tabId === 'cms') renderDaftarModulCMS(); if(tabId === 'materi') renderDaftarMateriCMS();
+    }
+
+    function loginAdmin() { 
+        playClick(); 
+        if (prompt("PIN HRD:") === appSettings.pin_admin) { 
+            localStorage.setItem('admin_logged_in', 'true'); 
+            
+            muatDataAdminFirebase(); 
+            onValue(ref(db, 'online_users'), (snapshot) => { 
+                const tbody = document.getElementById('admin-table-online'); tbody.innerHTML = ''; 
+                const data = snapshot.val(); 
+                if(!data) { tbody.innerHTML = `<tr><td colspan="3" align="center">Offline</td></tr>`; return; } 
+                for(let key in data) { tbody.innerHTML += `<tr><td><i class="fa-solid fa-circle" style="color:var(--success); font-size:10px;"></i> <b>${data[key].nama}</b></td><td>${data[key].divisi}</td><td>${data[key].waktu}</td></tr>`; } 
+            }); 
+            showSection('admin-section'); 
+            gantiTabAdmin('data'); 
+        } else { 
+            alert("Akses PIN Gagal!"); 
+        } 
+    }
+
+    function keluarAdmin() {
+        playClick();
+        if(confirm("Anda yakin ingin keluar dari Panel Admin?")) {
+            localStorage.removeItem('admin_logged_in');
+            window.location.reload();
+        }
+    }    
+
+    function muatDataAdminFirebase() {
+        onValue(ref(db, 'rekap_evaluasi'), (snapshot) => {
+            const tbody = document.getElementById('admin-table-body'); tbody.innerHTML = ''; const data = snapshot.val();
+            if (!data) { tbody.innerHTML = `<tr><td colspan="6" align="center">Kosong</td></tr>`; rekapDataGlobal = []; return; }
+            let arr = []; for(let key in data) { arr.push({ id: key, ...data[key] }); }
+            rekapDataGlobal = arr.sort((a, b) => b.skor - a.skor);
+            rekapDataGlobal.forEach(d => {
+                let w = d.status === "LULUS" ? "var(--success)" : "var(--danger)";
+                tbody.innerHTML += `<tr><td><b>${d.nama}</b><br><span style='color:var(--primary); font-size:10px;'>[${d.divisi||''}]</span></td><td>${d.ujian}</td><td><b>${d.skor}</b></td><td style="color:${w}; font-weight:800;">${d.status}</td><td style="font-size:10px; color:gray;">${d.device}<br>${d.waktu}</td><td><button onclick="hapusSatuKandidat('${d.id}')" style="background:var(--danger); color:white; border:none; padding:5px 8px; border-radius:5px; cursor:pointer;"><i class="fa-solid fa-trash"></i></button></td></tr>`;
+            });
+            if(!document.getElementById('adm-view-chart').classList.contains('hidden')) renderChart();
+        });
+    }
+
+    function hapusSatuKandidat(id) { if(confirm("Hapus rekap ini?")) remove(ref(db, 'rekap_evaluasi/' + id)); }
+    function hapusSemuaData() { if(confirm("Bersihkan database?")) remove(ref(db, 'rekap_evaluasi')); }
+    function renderChart() {
+        const ctx = document.getElementById('passFailChart').getContext('2d'); let lulus = 0, gagal = 0, disk = 0;
+        rekapDataGlobal.forEach(d => { if(d.status==="LULUS") lulus++; else if(d.status==="DISKUALIFIKASI") disk++; else gagal++; });
+        if(myChart) myChart.destroy();
+        myChart = new Chart(ctx, { type: 'doughnut', data: { labels: ['Lulus', 'Gagal', 'Diskualifikasi'], datasets: [{ data: [lulus, gagal, disk], backgroundColor: ['#16a34a', '#eab308', '#dc2626'], borderWidth: 0 }] }, options: { responsive: true, plugins: { legend: { position: 'bottom' } } } });
+    }
+    function eksporCSV() {
+        if(rekapDataGlobal.length === 0) { alert("Data Kosong."); return; }
+        let csv = "Nama Kandidat,Divisi,Modul Ujian,Skor,Status Kelulusan,Perangkat,Waktu Penyelesaian\n";
+        rekapDataGlobal.forEach(d => { csv += `"${d.nama}","${d.divisi||'-'}","${d.ujian}",${d.skor},"${d.status}","${d.device}","${d.waktu}"\n`; });
+        const blob = new Blob([csv], { type: 'text/csv;charset=utf-8;' }); const url = URL.createObjectURL(blob); const link = document.createElement("a"); link.setAttribute("href", url); link.setAttribute("download", "Laporan_KPI_Tirta_Teknosys.csv"); link.click();
+    }
+
+    // --- COMBOBOX MODULE ---
+    function renderDaftarModulCMS() {
+        const kat = document.getElementById('cms-kategori').value; 
+        const datalist = document.getElementById('cms-modul-list'); 
+        datalist.innerHTML = '';
+        if(activeBankSoal[kat]) { 
+            Object.keys(activeBankSoal[kat]).forEach(mod => { 
+                datalist.innerHTML += `<option value="${mod}">`; 
+            }); 
+        }
+        renderDaftarSoalCMS();
+    }
+
+    function renderDaftarSoalCMS() {
+        const kat = document.getElementById('cms-kategori').value; 
+        const mod = document.getElementById('cms-modul').value; 
+        const cont = document.getElementById('cms-daftar-soal'); cont.innerHTML = '';
+        
+        if(!mod) { cont.innerHTML = '<p style="font-size:12px; color:gray;">Pilih Divisi dan Modul untuk melihat soal...</p>'; return; }
+        if(!activeBankSoal[kat] || !activeBankSoal[kat][mod] || activeBankSoal[kat][mod].length === 0) { cont.innerHTML = '<p style="font-size:12px; color:gray;">Belum ada soal.</p>'; return; }
+        
+        activeBankSoal[kat][mod].forEach((s, idx) => {
+            cont.innerHTML += `
+            <div class="question-list-item">
+                <div><b>${idx+1}.</b> ${s.q} ${s.image ? '<i class="fa-solid fa-image" style="color:var(--primary);"></i>' : ''}</div>
+                <div>
+                    <button onclick="editSatuSoal('${kat}', '${mod}', ${idx})" style="background:var(--warning); color:white; border:none; padding:5px 8px; border-radius:5px; cursor:pointer; margin-right:5px;"><i class="fa-solid fa-pen"></i></button>
+                    <button onclick="hapusSatuSoal('${kat}', '${mod}', ${idx})" style="background:var(--danger); color:white; border:none; padding:5px 8px; border-radius:5px; cursor:pointer;"><i class="fa-solid fa-trash"></i></button>
+                </div>
+            </div>`;
+        });
+    }
+
+    // --- EDIT SOAL ---
+    function editSatuSoal(kat, mod, idx) {
+        const s = activeBankSoal[kat][mod][idx];
+        document.getElementById('cms-q').value = s.q;
+        document.getElementById('cms-img').value = s.image || '';
+        document.getElementById('cms-opt0').value = s.options[0];
+        document.getElementById('cms-opt1').value = s.options[1];
+        document.getElementById('cms-opt2').value = s.options[2];
+        document.getElementById('cms-opt3').value = s.options[3];
+        document.getElementById('cms-ans').value = s.answer;
+        
+        editSoalIndex = idx;
+        document.getElementById('btn-simpan-soal').innerHTML = '<i class="fa-solid fa-save"></i> Update Soal';
+        document.getElementById('btn-batal-edit-soal').classList.remove('hidden');
+        
+        document.getElementById('cms-kategori').disabled = true;
+        document.getElementById('cms-modul').disabled = true;
+
+        document.getElementById('adm-view-cms').scrollIntoView({behavior: "smooth"});
+    }
+
+    function batalEditSoal() {
+        document.getElementById('cms-q').value = ''; 
+        document.getElementById('cms-img').value = ''; 
+        document.getElementById('cms-opt0').value = ''; 
+        document.getElementById('cms-opt1').value = ''; 
+        document.getElementById('cms-opt2').value = ''; 
+        document.getElementById('cms-opt3').value = ''; 
+        document.getElementById('cms-ans').value = '0';
+        editSoalIndex = -1;
+        document.getElementById('btn-simpan-soal').innerHTML = '<i class="fa-solid fa-upload"></i> Publikasi ke Cloud';
+        document.getElementById('btn-batal-edit-soal').classList.add('hidden');
+        
+        document.getElementById('cms-kategori').disabled = false;
+        document.getElementById('cms-modul').disabled = false;
+    }
+
+    function hapusSatuSoal(kat, mod, idx) { 
+        if (editSoalIndex !== -1) {
+            alert("Harap selesaikan atau tekan 'Batal Edit' terlebih dahulu sebelum menghapus soal!");
+            return;
+        }
+        if(confirm("Hapus soal ini?")) { 
+            activeBankSoal[kat][mod].splice(idx, 1); 
+            set(ref(db, 'bank_soal_cloud'), activeBankSoal).then(() => { renderDaftarSoalCMS(); }); 
+        } 
+    }
+
+    function simpanSoalBaru() {
+        const kat = document.getElementById('cms-kategori').value; const mod = document.getElementById('cms-modul').value; 
+        const q = document.getElementById('cms-q').value; const img = document.getElementById('cms-img').value;
+        const opt = [document.getElementById('cms-opt0').value, document.getElementById('cms-opt1').value, document.getElementById('cms-opt2').value, document.getElementById('cms-opt3').value]; const ans = parseInt(document.getElementById('cms-ans').value);
+        
+        if(!mod || !q || !opt[0] || !opt[1] || !opt[2] || !opt[3]) { alert("Isi form secara lengkap (Pastikan Modul terisi)!"); return; }
+        if(!activeBankSoal[kat]) activeBankSoal[kat] = {}; if(!activeBankSoal[kat][mod]) activeBankSoal[kat][mod] = [];
+        
+        if (editSoalIndex !== -1) {
+            activeBankSoal[kat][mod][editSoalIndex] = { q: q, image: img, options: opt, answer: ans };
+        } else {
+            activeBankSoal[kat][mod].push({ q: q, image: img, options: opt, answer: ans });
+        }
+
+        set(ref(db, 'bank_soal_cloud'), activeBankSoal).then(() => { 
+            alert("Soal Cloud Diperbarui!"); 
+            batalEditSoal(); 
+            renderDaftarModulCMS();
+        });
+    }
+
+    function simpanMateriBaru() {
+        const kat = document.getElementById('cms-mat-kategori').value; const judul = document.getElementById('cms-mat-judul').value; 
+        const konten = quill.root.innerHTML; const img = document.getElementById('cms-mat-img').value; const vid = document.getElementById('cms-mat-vid').value; 
+
+        if(!judul || konten === '<p><br></p>') { alert("Judul sub-materi dan konten wajib diisi!"); return; }
+        
+        if (editMateriKey !== null) {
+            const materiRef = ref(db, `materi_pembelajaran_cloud/${kat}/${editMateriKey}`);
+            update(materiRef, { judul: judul, konten: konten, image: img, video: vid }).then(() => {
+                alert(`Materi [${judul}] berhasil diupdate!`);
+                batalEditMateri();
+            });
+        } else {
+            const materiRef = ref(db, `materi_pembelajaran_cloud/${kat}`);
+            push(materiRef, { judul: judul, konten: konten, image: img, video: vid }).then(() => {
+                alert(`Materi kategori [${kat}] berhasil ditambahkan!`);
+                batalEditMateri();
+            });
+        }
+    }
+
+    function renderDaftarMateriCMS() {
+        const cont = document.getElementById('cms-daftar-materi'); cont.innerHTML = '';
+        if(Object.keys(activeMateriCloud).length === 0) { cont.innerHTML = '<p style="font-size:12px; color:gray;">Belum ada materi pembelajaran di cloud.</p>'; return; }
+        for (let kategori in activeMateriCloud) {
+            let subMateriObj = activeMateriCloud[kategori];
+            for (let subKey in subMateriObj) {
+                cont.innerHTML += `
+                    <div class="question-list-item">
+                        <div><span style="color:var(--primary); font-weight:bold;">[${kategori}]</span> ${subMateriObj[subKey].judul}</div>
+                        <div>
+                            <button onclick="editMateriSpesifik('${kategori}', '${subKey}')" style="background:var(--warning); color:white; border:none; padding:5px 8px; border-radius:5px; cursor:pointer; margin-right:5px;"><i class="fa-solid fa-pen"></i></button>
+                            <button onclick="hapusMateriSpesifik('${kategori}', '${subKey}')" style="background:var(--danger); color:white; border:none; padding:5px 8px; border-radius:5px; cursor:pointer;"><i class="fa-solid fa-trash"></i></button>
+                        </div>
+                    </div>`;
+            }
+        }
+    }
+
+    // --- HAPUS MATERI ---
+    function hapusMateriSpesifik(kategori, subKey) { 
+        if (editMateriKey !== null) {
+            alert("Harap selesaikan atau tekan 'Batal Edit' terlebih dahulu sebelum menghapus materi!");
+            return;
+        }
+        if(confirm("Hapus sub-materi ini dari Cloud?")) { 
+            remove(ref(db, `materi_pembelajaran_cloud/${kategori}/${subKey}`)).then(() => { 
+                renderDaftarMateriCMS(); 
+            }); 
+        } 
+    }
+
+    // --- EDIT MATERI ---
+    function editMateriSpesifik(kategori, subKey) {
+        const mat = activeMateriCloud[kategori][subKey];
+        document.getElementById('cms-mat-kategori').value = kategori;
+        document.getElementById('cms-mat-judul').value = mat.judul;
+        document.getElementById('cms-mat-img').value = mat.image || '';
+        document.getElementById('cms-mat-vid').value = mat.video || '';
+        
+        quill.clipboard.dangerouslyPasteHTML(mat.konten); 
+        
+        editMateriKey = subKey;
+        document.getElementById('btn-simpan-materi').innerHTML = '<i class="fa-solid fa-save"></i> Update ';
+        document.getElementById('btn-batal-edit-materi').classList.remove('hidden');
+        
+        document.getElementById('cms-mat-kategori').disabled = true;
+
+        document.getElementById('adm-view-materi').scrollIntoView({behavior: "smooth"});
+    }
+
+    function batalEditMateri() {
+        document.getElementById('cms-mat-judul').value = ''; 
+        document.getElementById('cms-mat-img').value = ''; 
+        document.getElementById('cms-mat-vid').value = ''; 
+        quill.setContents([]); 
+        editMateriKey = null;
+        document.getElementById('btn-simpan-materi').innerHTML = '<i class="fa-solid fa-save"></i> Upload Materi ke Cloud';
+        document.getElementById('btn-batal-edit-materi').classList.add('hidden');
+        
+        document.getElementById('cms-mat-kategori').disabled = false;
+    }
+
+    function simpanPengaturan() { const t = document.getElementById('set-token').value; const w = parseInt(document.getElementById('set-waktu').value); const p = document.getElementById('set-pin').value; if(t === '' || p === '' || isNaN(w) || w <= 0) { alert("Data tidak valid!"); return; } update(ref(db, 'app_settings'), { token: t, waktu: w, pin_admin: p }).then(() => { alert("Konfigurasi Cloud Sukses Terbuka!"); }); }
+
+    // --- IMPORT CSV SOAL ---
+    function importCSVSoal() {
+        const fileInput = document.getElementById('cms-csv-file');
+        const kat = document.getElementById('cms-kategori').value;
+        const mod = document.getElementById('cms-modul').value;
+
+        if (!fileInput.files.length) { alert("Pilih file CSV terlebih dahulu!"); return; }
+        if (!mod) { alert("Pilih atau ketik Nama Modul tujuan terlebih dahulu!"); return; }
+        if(!confirm(`PERHATIAN:\nAnda akan menyuntikkan data Soal ke:\nDivisi: [${kat}]\nModul: [${mod}]\n\nApakah sudah benar?`)) return;
+
+        const reader = new FileReader();
+        reader.onload = function(e) {
+            const rows = e.target.result.split('\n'); let soalBaru = [];
+            
+            function parseCSVRow(str) {
+                let arr = []; let quote = false; let col = '';
+                for (let i = 0; i < str.length; i++) {
+                    let cc = str[i], nc = str[i+1];
+                    if (cc === '"' && quote && nc === '"') { col += '"'; i++; continue; }
+                    if (cc === '"') { quote = !quote; continue; }
+                    if (cc === ',' && !quote) { arr.push(col.trim()); col = ''; continue; }
+                    col += cc;
+                }
+                arr.push(col.trim()); return arr;
+            }
+
+            for (let i = 1; i < rows.length; i++) {
+                if(rows[i].trim() === '') continue;
+                const cols = parseCSVRow(rows[i]); 
+                if (cols.length >= 7) {
+                    const q = cols[0]; const img = cols[1]; const opt0 = cols[2]; const opt1 = cols[3]; const opt2 = cols[4]; const opt3 = cols[5]; const ans = parseInt(cols[6]);
+                    if (q !== "" && !isNaN(ans)) soalBaru.push({ q: q, image: img === '-' || img === '' ? '' : img, options: [opt0, opt1, opt2, opt3], answer: ans });
+                }
+            }
+
+            if (soalBaru.length > 0) {
+                if (!activeBankSoal[kat]) activeBankSoal[kat] = {}; if (!activeBankSoal[kat][mod]) activeBankSoal[kat][mod] = [];
+                activeBankSoal[kat][mod] = activeBankSoal[kat][mod].concat(soalBaru);
+                set(ref(db, 'bank_soal_cloud'), activeBankSoal).then(() => { alert(`Berhasil mengimpor ${soalBaru.length} soal!`); fileInput.value = ''; renderDaftarModulCMS(); });
+            } else { alert("Gagal. Pastikan format CSV sesuai (7 Kolom Data)."); }
+        };
+        reader.readAsText(fileInput.files[0]);
+    }
+
+    // --- IMPORT CSV MATERI ---
+    function importCSVMateri() {
+        const fileInput = document.getElementById('cms-csv-materi');
+        const kat = document.getElementById('cms-mat-kategori').value;
+        if (!fileInput.files.length) { alert("Pilih file CSV Materi!"); return; }
+        if(!confirm(`PERHATIAN:\nAnda akan menyuntikkan data Materi ke Kategori: [${kat}]\n\nApakah sudah benar?`)) return;
+
+        const reader = new FileReader();
+        reader.onload = function(e) {
+            const rows = e.target.result.split('\n'); let successCount = 0;
+            function parseCSVRow(str) {
+                let arr = []; let quote = false; let col = '';
+                for (let i = 0; i < str.length; i++) {
+                    let cc = str[i], nc = str[i+1];
+                    if (cc === '"' && quote && nc === '"') { col += '"'; i++; continue; }
+                    if (cc === '"') { quote = !quote; continue; }
+                    if (cc === ',' && !quote) { arr.push(col.trim()); col = ''; continue; }
+                    col += cc;
+                }
+                arr.push(col.trim()); return arr;
+            }
+
+            for (let i = 1; i < rows.length; i++) {
+                if(rows[i].trim() === '') continue;
+                const cols = parseCSVRow(rows[i]);
+                if (cols.length >= 2) {
+                    const judul = cols[0]; const konten = cols[1]; const img = cols[2] ? cols[2] : ''; const vid = cols[3] ? cols[3] : '';
+                    if (judul !== "" && konten !== "") {
+                        push(ref(db, `materi_pembelajaran_cloud/${kat}`), { judul: judul, konten: konten, image: img === '-' || img === '' ? '' : img, video: vid === '-' || vid === '' ? '' : vid });
+                        successCount++;
+                    }
+                }
+            }
+            if (successCount > 0) { alert(`Berhasil mengimpor ${successCount} materi!`); fileInput.value = ''; } 
+            else { alert("Gagal membaca materi. Cek format CSV."); }
+        };
+        reader.readAsText(fileInput.files[0]);
+    }
+
+    Object.assign(window, { toggleTheme, playClick, toggleCalc, calcInput, calcClear, calcEval, gantiTabAuth, prosesAuth, loginGoogle, loginAdmin, keluarAdmin, keluarSistem, showSection, bukaSubKategori, cekTokenDanMulai, navigasiSoal, toggleRagu, konfirmasiSubmit, submitTest, hapusSemuaData, hapusSatuKandidat, lompatSoal, gantiTabAdmin, eksporCSV, simpanSoalBaru, hapusSatuSoal, simpanPengaturan, restoreDefaultBankSoal, renderDaftarModulCMS, renderDaftarSoalCMS, bukaHalamanMateri, bukaDaftarSubMateri, simpanMateriBaru, hapusMateriSpesifik, importCSVSoal, importCSVMateri, editSatuSoal, batalEditSoal, editMateriSpesifik, batalEditMateri });
+    
+</script>
+</body>
+</html>
