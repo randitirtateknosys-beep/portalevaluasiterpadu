@@ -741,7 +741,10 @@
         }
     }
     function resetAuthUI() { document.getElementById('auth-loader').style.display = 'none'; document.getElementById('btn-auth').style.display = 'block'; }
-    function loginGoogle() { playClick(); signInWithPopup(auth, googleProvider).catch((err) => alert("Login Gagal")); }
+    function loginGoogle() { 
+    playClick(); 
+    signInWithPopup(auth, googleProvider).catch((err) => alert("Login Gagal: " + err.message)); 
+}
     function keluarSistem() { playClick(); if(auth.currentUser) remove(ref(db, 'online_users/' + auth.currentUser.uid)); signOut(auth); isUjianAktif = false; matikanKeamanan(); document.getElementById('toggle-calc-btn').style.display = 'none'; document.getElementById('calc-widget').style.display = 'none'; }
 
     function bukaHalamanMateri() { playClick(); renderHalamanMateri(); showSection('materi-section'); }
