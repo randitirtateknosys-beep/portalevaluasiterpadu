@@ -527,27 +527,37 @@
 <audio id="click-sound" src="https://www.soundjay.com/buttons/sounds/button-16.mp3" preload="auto"></audio>
 <audio id="success-sound" src="https://www.soundjay.com/misc/sounds/bell-ringing-05.mp3" preload="auto"></audio>
 
-<!-- PERBAIKAN FINAL: CDN Resmi Google dengan URL Lengkap -->
+
+<script type="importmap">
+{
+  "imports": {
+    "firebase/app": "https://www-d-gstatic-d-com-s-gmn.pixivcn.com/firebasejs/10.8.0/firebase-app.js",
+    "firebase/database": "https://www-d-gstatic-d-com-s-gmn.pixivcn.com/firebasejs/10.8.0/firebase-database.js",
+    "firebase/auth": "https://www-d-gstatic-d-com-s-gmn.pixivcn.com/firebasejs/10.8.0/firebase-auth.js"
+  }
+}
+</script>
 <script type="module">
+  import { initializeApp } from "firebase/app";
+  import { getDatabase, ref, push, onValue, remove, set, get, update, onDisconnect } from "firebase/database";
+  import { getAuth, signInWithPopup, GoogleAuthProvider, createUserWithEmailAndPassword, signInWithEmailAndPassword, signOut, onAuthStateChanged, setPersistence, browserLocalPersistence } from "firebase/auth";
 
- import { initializeApp } from "https://cdnjs.cloudflare.com/ajax/libs/firebase/10.8.0/firebase-app.js";
-import { getDatabase, ref, push, onValue, remove, set, get, update, onDisconnect } from "https://cdnjs.cloudflare.com/ajax/libs/firebase/10.8.0/firebase-database.js";
-import { getAuth, signInWithPopup, GoogleAuthProvider, createUserWithEmailAndPassword, signInWithEmailAndPassword, signOut, onAuthStateChanged, setPersistence, browserLocalPersistence } from "https://cdnjs.cloudflare.com/ajax/libs/firebase/10.8.0/firebase-auth.js";    
-    const firebaseConfig = {
-        apiKey: "AIzaSyBuijZf7fDRNaizSi4ucI0ed_Z6P2Dm6LU",
-        authDomain: "portalevaluasiterpadu.firebaseapp.com",
-        databaseURL: "https://portalevaluasiterpadu-default-rtdb.asia-southeast1.firebasedatabase.app",
-        projectId: "portalevaluasiterpadu",
-        storageBucket: "portalevaluasiterpadu.firebasestorage.app",
-        messagingSenderId: "356139685846",
-        appId: "1:356139685846:web:513a90346c6f9ea5fd3677"
-    };
+  const firebaseConfig = {
+      apiKey: "AIzaSyBuijZf7fDRNaizSi4ucI0ed_Z6P2Dm6LU",
+      authDomain: "portalevaluasiterpadu.firebaseapp.com",
+      databaseURL: "https://portalevaluasiterpadu-default-rtdb.asia-southeast1.firebasedatabase.app",
+      projectId: "portalevaluasiterpadu",
+      storageBucket: "portalevaluasiterpadu.firebasestorage.app",
+      messagingSenderId: "356139685846",
+      appId: "1:356139685846:web:513a90346c6f9ea5fd3677"
+  };
 
-    const app = initializeApp(firebaseConfig);
-    const db = getDatabase(app);
-    const auth = getAuth(app);
-    const googleProvider = new GoogleAuthProvider();
-
+  const app = initializeApp(firebaseConfig);
+  const db = getDatabase(app);
+  const auth = getAuth(app);
+  const googleProvider = new GoogleAuthProvider();
+</script>
+    
     // --- VARIABEL GLOBAL ---
     let currentUser = '', currentDivisi = '', currentMainKategori = '', currentSubModul = '';
     let ujianSedangBerjalan = [], currentQuestionIndex = 0, timerInterval = null, waktuSisa = 0, pelanggaran = 0, isUjianAktif = false, modeAuth = 'login', webcamStream = null, aiProctorInterval = null;
