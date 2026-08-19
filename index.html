@@ -528,6 +528,7 @@
 <audio id="success-sound" src="https://www.soundjay.com/misc/sounds/bell-ringing-05.mp3" preload="auto"></audio>
 
 
+<!-- 1. 使用 Import Map 锁定官方干净的 URL，阻断任何隐形字符干扰 -->
 <script type="importmap">
 {
   "imports": {
@@ -537,6 +538,8 @@
   }
 }
 </script>
+
+<!-- 2. 主脚本逻辑：只调用映射名称，绝对不写 URL -->
 <script type="module">
   import { initializeApp } from "firebase/app";
   import { getDatabase, ref, push, onValue, remove, set, get, update, onDisconnect } from "firebase/database";
@@ -556,6 +559,9 @@
   const db = getDatabase(app);
   const auth = getAuth(app);
   const googleProvider = new GoogleAuthProvider();
+
+  // 保留你原有的全部后续业务代码...
+  // let currentUser = '', currentDivisi = '' ... 等等
 </script>
     
     // --- VARIABEL GLOBAL ---
