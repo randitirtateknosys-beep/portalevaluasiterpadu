@@ -6,7 +6,7 @@
     <title>PT. Tirta Teknosys | V10.3 Ultimate (Word Integrated)</title>
     
     <link rel="preconnect" href="https://fonts.googleapis.com">
-    <!-- PERBAIKAN: Menggunakan Gstatic Resmi -->
+    <!-- FIX: Mengembalikan link CDN font ke server resmi gstatic (sebelumnya proxy pixivcn) -->
     <link rel="preconnect" href="https://fonts-d-gstatic-d-com-s-gmn.pixivcn.com" crossorigin>
 
     <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&display=swap" rel="stylesheet">
@@ -17,7 +17,6 @@
     <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
 
     <style>
-        /* --- TEMA TERANG & GELAP --- */
         :root {
             --primary: #0284c7; --primary-light: #38bdf8; --success: #16a34a; --danger: #dc2626; --warning: #eab308;
             --bg-color: #f8fafc; --card-bg: #ffffff; --text-main: #0f172a; --text-muted: #64748b;
@@ -205,7 +204,10 @@
             <div class="admin-tab" id="tab-adm-online" onclick="gantiTabAdmin('online')"><i class="fa-solid fa-wifi"></i> Online</div>
             <div class="admin-tab" id="tab-adm-chart" onclick="gantiTabAdmin('chart')"><i class="fa-solid fa-chart-pie"></i> Analitik</div>
             <div class="admin-tab" id="tab-adm-cms" onclick="gantiTabAdmin('cms')"><i class="fa-solid fa-pen-to-square"></i> Bank Soal</div>
+            <div class="admin-tab" id="tab-adm-histori-soal" onclick="gantiTabAdmin('histori-soal')"><i class="fa-solid fa-clock-rotate-left"></i> Histori Manual</div>
             <div class="admin-tab" id="tab-adm-materi" onclick="gantiTabAdmin('materi')"><i class="fa-solid fa-book-bookmark"></i> Materi CMS</div>
+            <div class="admin-tab" id="tab-adm-histori-materi" onclick="gantiTabAdmin('histori-materi')"><i class="fa-solid fa-history"></i> Histori Materi</div>
+            <div class="admin-tab" id="tab-adm-histori-csv" onclick="gantiTabAdmin('histori-csv')"><i class="fa-solid fa-file-csv"></i> Histori Import CSV</div>
             <div class="admin-tab" id="tab-adm-settings" onclick="gantiTabAdmin('settings')"><i class="fa-solid fa-gear"></i> Pengaturan</div>
         </div>
 
@@ -241,6 +243,7 @@
         <div id="adm-view-cms" class="hidden">
             <div class="cms-form">
                 <h3 style="font-size: 15px; margin-bottom: 15px;"><i class="fa-solid fa-cloud-arrow-up"></i> Kelola Soal Evaluasi</h3>
+                
                 <div class="cms-grid">
                     <div class="form-group">
                         <label>Pilih Divisi Ujian</label>
@@ -259,51 +262,62 @@
                     </div>
                 </div>
                 
-                <div class="form-group"><label>Pertanyaan</label><input type="text" id="cms-q" placeholder="Ketik pertanyaan..."></div>
-                <div class="form-group"><label>URL Gambar (Opsional)</label><input type="text" id="cms-img" placeholder="Masukkan URL Link Gambar (Mendukung .png, .jpg)..."></div>
-                <div class="cms-grid">
-                    <div class="form-group"><label>Opsi A</label><input type="text" id="cms-opt0" placeholder="Pilihan 1"></div>
-                    <div class="form-group"><label>Opsi B</label><input type="text" id="cms-opt1" placeholder="Pilihan 2"></div>
-                    <div class="form-group"><label>Opsi C</label><input type="text" id="cms-opt2" placeholder="Pilihan 3"></div>
-                    <div class="form-group"><label>Opsi D</label><input type="text" id="cms-opt3" placeholder="Pilihan 4"></div>
+                <div style="padding-top: 15px; border-top: 1px dashed var(--border-color); margin-top: 10px;">
+                    <label style="font-size: 13px; font-weight: bold; color: var(--primary);">Opsi 1: Input Soal Manual</label>
+                    <div class="form-group" style="margin-top: 10px;"><label>Pertanyaan</label><input type="text" id="cms-q" placeholder="Ketik pertanyaan..."></div>
+                    <div class="form-group"><label>URL Gambar (Opsional)</label><input type="text" id="cms-img" placeholder="Masukkan URL Link Gambar (Mendukung .png, .jpg)..."></div>
+                    <div class="cms-grid">
+                        <div class="form-group"><label>Opsi A</label><input type="text" id="cms-opt0" placeholder="Pilihan 1"></div>
+                        <div class="form-group"><label>Opsi B</label><input type="text" id="cms-opt1" placeholder="Pilihan 2"></div>
+                        <div class="form-group"><label>Opsi C</label><input type="text" id="cms-opt2" placeholder="Pilihan 3"></div>
+                        <div class="form-group"><label>Opsi D</label><input type="text" id="cms-opt3" placeholder="Pilihan 4"></div>
+                    </div>
+                    <div class="form-group"><label>Kunci Jawaban Benar</label>
+                        <select id="cms-ans"><option value="0">Opsi A</option><option value="1">Opsi B</option><option value="2">Opsi C</option><option value="3">Opsi D</option></select>
+                    </div>
+                    
+                    <div style="display:flex; gap:10px;">
+                        <button class="btn btn-primary" id="btn-simpan-soal" onclick="simpanSoalBaru()"><i class="fa-solid fa-upload"></i> Publikasi ke Cloud</button>
+                        <button class="btn btn-outline hidden" id="btn-batal-edit-soal" onclick="batalEditSoal()">Batal Edit</button>
+                    </div>
                 </div>
-                <div class="form-group"><label>Kunci Jawaban Benar</label>
-                    <select id="cms-ans"><option value="0">Opsi A</option><option value="1">Opsi B</option><option value="2">Opsi C</option><option value="3">Opsi D</option></select>
-                </div>
-                
-                <div style="display:flex; gap:10px;">
-                    <button class="btn btn-primary" id="btn-simpan-soal" onclick="simpanSoalBaru()"><i class="fa-solid fa-upload"></i> Publikasi ke Cloud</button>
-                    <button class="btn btn-outline hidden" id="btn-batal-edit-soal" onclick="batalEditSoal()">Batal Edit</button>
-                </div>
-            </div>
 
-            <div style="margin-top: 20px; padding-top: 15px; border-top: 1px dashed var(--border-color);">
-                <label style="font-size: 13px; font-weight: bold; color: var(--text-main);">Atau Upload Massal via File CSV:</label>
-                <div style="display: flex; gap: 10px; margin-top: 8px;">
-                    <input type="file" id="cms-csv-file" accept=".csv" style="flex: 1; padding: 8px; border: 1.5px solid var(--border-color); border-radius: 10px; background: var(--card-bg); color: var(--text-main);">
-                    <button class="btn btn-warning" style="width: auto; padding: 10px 15px; font-size: 13px;" onclick="importCSVSoal()">
-                        <i class="fa-solid fa-file-csv"></i> Import CSV
-                    </button>
+                <div style="margin-top: 20px; padding-top: 15px; border-top: 1px dashed var(--border-color);">
+                    <label style="font-size: 13px; font-weight: bold; color: var(--warning);">Opsi 2: Upload Massal via File CSV</label>
+                    <p style="font-size: 11px; color: var(--text-muted); margin-bottom: 8px;">Soal akan di-import ke Divisi dan Modul yang telah Anda pilih di atas.</p>
+                    <div style="display: flex; gap: 10px;">
+                        <input type="file" id="cms-csv-file" accept=".csv" style="flex: 1; padding: 8px; border: 1.5px solid var(--border-color); border-radius: 10px; background: var(--card-bg); color: var(--text-main);">
+                        <button class="btn btn-warning" style="width: auto; padding: 10px 15px; font-size: 13px;" onclick="importCSVSoal()">
+                            <i class="fa-solid fa-file-csv"></i> Import CSV
+                        </button>
+                    </div>
+                    <p style="font-size: 11px; color: var(--text-muted); margin-top: 8px;">
+                        <i class="fa-solid fa-circle-info"></i> Format kolom: Pertanyaan, URL_Gambar, OpsiA, OpsiB, OpsiC, OpsiD, IndexJawaban(0-3)
+                    </p>
                 </div>
-                <p style="font-size: 11px; color: var(--text-muted); margin-top: 8px;">
-                    <i class="fa-solid fa-circle-info"></i> Format kolom: Pertanyaan, URL_Gambar, OpsiA, OpsiB, OpsiC, OpsiD, IndexJawaban(0-3)
-                </p>
             </div>
             
             <div class="cms-form" style="background: var(--card-bg);">
                 <h3 style="font-size: 15px; margin-bottom: 15px;"><i class="fa-solid fa-list-check"></i> Daftar Soal pada Modul Terpilih</h3>
                 <div id="cms-daftar-soal">Pilih Divisi dan Modul untuk melihat soal...</div>
             </div>
-            
-            <div style="border-top: 1px solid var(--border-color); margin-top: 20px; padding-top: 20px;">
-                <h3 style="font-size: 15px; color: var(--danger);"><i class="fa-solid fa-triangle-exclamation"></i> Zona Pemulihan</h3>
-                <button class="btn btn-warning" style="width: auto; font-size: 13px;" onclick="restoreDefaultBankSoal()"><i class="fa-solid fa-rotate-left"></i> Restore 6 Modul Utama (Termasuk 12 Soal Word) ke Server</button>
+        </div>
+
+        <div id="adm-view-histori-soal" class="hidden">
+            <h3 style="font-size: 15px; margin-bottom: 15px;"><i class="fa-solid fa-clock-rotate-left"></i> Histori Input Soal Manual</h3>
+            <p style="font-size: 12px; color: var(--text-muted); margin-bottom: 15px;">Daftar soal yang diinput secara manual. Menghapus data ini juga akan menghapusnya dari Bank Soal Cloud.</p>
+            <div class="table-wrapper">
+                <table>
+                    <thead><tr><th>Divisi</th><th>Modul</th><th>Pertanyaan</th><th>Waktu Input</th><th>Aksi</th></tr></thead>
+                    <tbody id="admin-table-histori-soal"><tr><td colspan="5" align="center">Memuat histori soal...</td></tr></tbody>
+                </table>
             </div>
         </div>
 
         <div id="adm-view-materi" class="hidden">
             <div class="cms-form">
                 <h3 style="font-size: 15px; margin-bottom: 15px;"><i class="fa-solid fa-file-circle-plus"></i> Kelola Materi Pembelajaran</h3>
+                
                 <div class="form-group">
                     <label>Pilih Kategori Pembelajaran</label>
                     <select id="cms-mat-kategori">
@@ -315,36 +329,69 @@
                         <option value="Instrumentasi">Materi Instrumentasi</option>
                     </select>
                 </div>
-                <div class="form-group"><label>Judul Sub-Materi</label><input type="text" id="cms-mat-judul" placeholder="Contoh: Pengenalan Wiring Diagram Kontaktor"></div>
-                <div class="form-group"><label>URL Gambar (Opsional)</label><input type="text" id="cms-mat-img" placeholder="Masukkan URL Link Gambar (Mendukung .png, .jpg)..."></div>
-                <div class="form-group"><label>URL Video (Opsional)</label><input type="text" id="cms-mat-vid" placeholder="Masukkan URL Video (MP4 / YouTube embed)..."></div>
 
-                <div class="form-group">
-                    <label>Konten / Ringkasan Materi Lengkap</label>
-                    <div style="background: var(--card-bg); border-radius: 10px; overflow: hidden; border: 1.5px solid var(--border-color);">
-                        <div id="editor-container" style="height: 250px; font-family: 'Plus Jakarta Sans', sans-serif; font-size: 14px; color: var(--text-main);"></div>
+                <div style="padding-top: 15px; border-top: 1px dashed var(--border-color); margin-top: 10px;">
+                    <label style="font-size: 13px; font-weight: bold; color: var(--primary);">Opsi 1: Input Materi Manual</label>
+                    <div class="form-group" style="margin-top: 10px;"><label>Judul Sub-Materi</label><input type="text" id="cms-mat-judul" placeholder="Contoh: Pengenalan Wiring Diagram Kontaktor"></div>
+                    <div class="form-group"><label>URL Gambar (Opsional)</label><input type="text" id="cms-mat-img" placeholder="Masukkan URL Link Gambar (Mendukung .png, .jpg)..."></div>
+                    <div class="form-group"><label>URL Video (Opsional)</label><input type="text" id="cms-mat-vid" placeholder="Masukkan URL Video (MP4 / YouTube embed)..."></div>
+                    <div class="form-group">
+                        <label>Konten / Ringkasan Materi Lengkap</label>
+                        <div style="background: var(--card-bg); border-radius: 10px; overflow: hidden; border: 1.5px solid var(--border-color);">
+                            <div id="editor-container" style="height: 250px; font-family: 'Plus Jakarta Sans', sans-serif; font-size: 14px; color: var(--text-main);"></div>
+                        </div>
+                    </div>
+                    <div style="display:flex; gap:10px;">
+                        <button class="btn btn-success" id="btn-simpan-materi" onclick="simpanMateriBaru()"><i class="fa-solid fa-save"></i> Upload Materi ke Cloud</button>
+                        <button class="btn btn-outline hidden" id="btn-batal-edit-materi" onclick="batalEditMateri()">Batal Edit</button>
                     </div>
                 </div>
 
-                <div style="display:flex; gap:10px;">
-                    <button class="btn btn-success" id="btn-simpan-materi" onclick="simpanMateriBaru()"><i class="fa-solid fa-save"></i> Upload Materi ke Cloud</button>
-                    <button class="btn btn-outline hidden" id="btn-batal-edit-materi" onclick="batalEditMateri()">Batal Edit</button>
-                </div>
-            </div>
-
-            <div style="margin-top: 20px; padding-top: 15px; border-top: 1px dashed var(--border-color);">
-                <label style="font-size: 13px; font-weight: bold; color: var(--text-main);">Atau Upload Materi Massal via File CSV:</label>
-                <div style="display: flex; gap: 10px; margin-top: 8px;">
-                    <input type="file" id="cms-csv-materi" accept=".csv" style="flex: 1; padding: 8px; border: 1.5px solid var(--border-color); border-radius: 10px; background: var(--card-bg); color: var(--text-main);">
-                    <button class="btn btn-warning" style="width: auto; padding: 10px 15px; font-size: 13px;" onclick="importCSVMateri()">
-                        <i class="fa-solid fa-file-csv"></i> Import CSV Materi
-                    </button>
+                <div style="margin-top: 20px; padding-top: 15px; border-top: 1px dashed var(--border-color);">
+                    <label style="font-size: 13px; font-weight: bold; color: var(--warning);">Opsi 2: Upload Materi Massal via File CSV</label>
+                    <p style="font-size: 11px; color: var(--text-muted); margin-bottom: 8px;">Materi akan di-import ke Kategori Pembelajaran yang Anda pilih di atas.</p>
+                    <div style="display: flex; gap: 10px;">
+                        <input type="file" id="cms-csv-materi" accept=".csv" style="flex: 1; padding: 8px; border: 1.5px solid var(--border-color); border-radius: 10px; background: var(--card-bg); color: var(--text-main);">
+                        <button class="btn btn-warning" style="width: auto; padding: 10px 15px; font-size: 13px;" onclick="importCSVMateri()">
+                            <i class="fa-solid fa-file-csv"></i> Import CSV Materi
+                        </button>
+                    </div>
                 </div>
             </div>
 
             <div class="cms-form" style="background: var(--card-bg);">
                 <h3 style="font-size: 15px; margin-bottom: 15px;"><i class="fa-solid fa-book"></i> Pengelola Materi Aktif</h3>
                 <div id="cms-daftar-materi">Memuat daftar materi cloud...</div>
+            </div>
+        </div>
+
+        <div id="adm-view-histori-materi" class="hidden">
+            <h3 style="font-size: 15px; margin-bottom: 15px;"><i class="fa-solid fa-history"></i> Histori Input Materi Manual</h3>
+            <p style="font-size: 12px; color: var(--text-muted); margin-bottom: 15px;">Daftar materi pembelajaran yang diinput secara manual. Menghapus data ini akan mencabut materinya dari server.</p>
+            <div class="table-wrapper">
+                <table>
+                    <thead><tr><th>Kategori</th><th>Judul Sub-Materi</th><th>Waktu Input</th><th>Aksi</th></tr></thead>
+                    <tbody id="admin-table-histori-materi"><tr><td colspan="4" align="center">Memuat histori materi...</td></tr></tbody>
+                </table>
+            </div>
+        </div>
+
+        <div id="adm-view-histori-csv" class="hidden">
+            <h3 style="font-size: 15px; margin-bottom: 15px;"><i class="fa-solid fa-file-csv"></i> Histori Upload File CSV Soal</h3>
+            <p style="font-size: 12px; color: var(--text-muted); margin-bottom: 15px;">Jika Anda menghapus data di bawah, seluruh soal dari file CSV terkait akan otomatis tercabut dari Bank Soal.</p>
+            <div class="table-wrapper">
+                <table>
+                    <thead><tr><th>Nama File</th><th>Divisi / Modul</th><th>Jumlah</th><th>Waktu</th><th>Aksi</th></tr></thead>
+                    <tbody id="admin-table-histori-csv-soal"><tr><td colspan="5" align="center">Memuat histori CSV...</td></tr></tbody>
+                </table>
+            </div>
+
+            <h3 style="font-size: 15px; margin-bottom: 15px; margin-top:25px;"><i class="fa-solid fa-file-csv"></i> Histori Upload File CSV Materi</h3>
+            <div class="table-wrapper">
+                <table>
+                    <thead><tr><th>Nama File</th><th>Kategori</th><th>Jumlah</th><th>Waktu</th><th>Aksi</th></tr></thead>
+                    <tbody id="admin-table-histori-csv-materi"><tr><td colspan="5" align="center">Memuat histori CSV...</td></tr></tbody>
+                </table>
             </div>
         </div>
 
@@ -506,7 +553,7 @@
 <audio id="click-sound" src="https://www.soundjay.com/buttons/sounds/button-16.mp3" preload="auto"></audio>
 <audio id="success-sound" src="https://www.soundjay.com/misc/sounds/bell-ringing-05.mp3" preload="auto"></audio>
 
-<!-- PERBAIKAN: Menggunakan Import Map yang 100% Benar dari Gstatic Google -->
+<!-- FIX: Mengembalikan link CDN Modul Firebase ke server resmi gstatic (sebelumnya proxy pixivcn) yang menyebabkan skrip berhenti total -->
 <script type="importmap">
 {
   "imports": {
@@ -517,7 +564,6 @@
 }
 </script>
 
-<!-- PERBAIKAN: Seluruh kode dibungkus rapi dalam 1 script module -->
 <script type="module">
     import { initializeApp } from "firebase/app";
     import { getDatabase, ref, push, onValue, remove, set, get, update, onDisconnect } from "firebase/database";
@@ -538,13 +584,26 @@
     const auth = getAuth(app);
     const googleProvider = new GoogleAuthProvider();
 
-    // --- VARIABEL GLOBAL ---
     let currentUser = '', currentDivisi = '', currentMainKategori = '', currentSubModul = '';
-    let ujianSedangBerjalan = [], currentQuestionIndex = 0, timerInterval = null, waktuSisa = 0, pelanggaran = 0, isUjianAktif = false, modeAuth = 'login', webcamStream = null, aiProctorInterval = null;
+    let ujianSedangBerjalan = [], currentQuestionIndex = 0, timerInterval = null, waktuSisa = 0, pelanggaran = 0, isUjianAktif = false, modeAuth = 'login';
+    
+    let activeBankSoal = {};
     let activeMateriCloud = {};
+    let historiSoalManual = {};
+    let historiMateriManual = {};
+    let historiCSVSoal = {};
+    let historiCSVMateri = {};
     
     let editSoalIndex = -1;
+    let editSoalBatchId = null; 
+    let editSoalInternalId = null; 
+    let editSoalOldKat = null;
+    let editSoalOldMod = null;
+    
     let editMateriKey = null;
+    let editMateriOldKat = null;
+    let editHistoriSoalId = null;
+    let editHistoriMateriId = null;
 
     let quill;
     document.addEventListener('DOMContentLoaded', () => {
@@ -612,57 +671,40 @@
         }
     });
 
-    const modulListWajib = ["Evaluasi Komponen Panel", "Evaluasi Timer Industri", "Evaluasi Kelistrikan", "Evaluasi Konversi Daya", "Evaluasi VfD & Softstater", "Evaluasi Instrumentasi"];
-    const defaultBankSoal = { "produksi": {}, "teknisi hospital": {}, "teknisi irescom": {}, "teknisi E-catalog": {} };
-    const soalKomponenPanelWord = [
-        { q: "Komponen apa yang berfungsi sebagai saklar elektromagnetik untuk memutus dan menyambungkan arus listrik pada beban berdaya besar seperti motor listrik?", image: "", options: ["Relay AC", "Surge Arrester", "Magnetic Contactor", "Thermal Overload Relay", "Solid State Relay"], answer: 2 },
-        { q: "Kontaktor memiliki beberapa kategori penggunaan berdasarkan jenis bebannya. Kategori yang tepat digunakan untuk menghidupkan dan mematikan motor induksi (Squirrel Cage) secara normal adalah...", image: "", options: ["AC-1", "AC-3", "DC-1", "DC-5", "AC-5"], answer: 1 },
-        { q: "Kontaktor DC dirancang berbeda dengan kontaktor AC. Mengapa memutus arus searah (DC) lebih sulit dan memerlukan arc chute yang lebih besar?", image: "", options: ["Karena arus DC lebih cepat merusak koil.", "Karena arus DC tidak memiliki titik nol (zero crossing) sehingga busur api sulit padam.", "Karena tegangan DC lebih sering naik turun.", "Karena motor DC membutuhkan daya angkat yang lebih ringan.", "Karena arus DC menimbulkan medan magnet yang berlawanan."], answer: 1 },
-        { q: "Thermal Overload Relay (TOR) berfungsi untuk melindungi motor dari panas berlebih akibat arus beban lebih. Komponen internal utama pada TOR yang bertugas mendeteksi panas tersebut adalah...", image: "", options: ["Shading coil", "Metal Oxide Varistor (MOV)", "Semikonduktor / Thyristor", "Elemen Bimetal", "Inti besi (Armature)"], answer: 3 },
-        { q: "Sebuah motor listrik 3 fasa memiliki Arus Nominal (In) atau Full Load Amperage (FLA) sebesar 20 Ampere. Berapakah rentang setting arus yang direkomendasikan pada Thermal Overload Relay (TOR)?", image: "", options: ["15 A - 18 A", "20 A (Sama persis)", "21 A - 22 A", "30 A - 40 A", "40 A - 50 A"], answer: 2 },
-        { q: "Pada TOR terdapat tombol berlabel 'TEST' (biasanya berwarna merah). Fungsi dari tombol tersebut adalah untuk...", image: "", options: ["Me-reset TOR ke pengaturan pabrik.", "Mengukur tegangan yang masuk ke motor.", "Mensimulasikan pergerakan bimetal secara manual untuk menguji apakah kontak kontrol 95-96 berfungsi memutus sirkuit.", "Menghidupkan motor secara langsung tanpa melewati kontaktor.", "Mengaktifkan lampu indikator pada panel."], answer: 2 },
-        { q: "Relay elektromekanik AC memiliki komponen tambahan pada inti besinya untuk mencegah getaran parah (chattering) saat tegangan bolak-balik melewati titik nol. Komponen tersebut dinamakan...", image: "", options: ["Bimetal strip", "Blowout magnet", "Shading ring (Shading coil)", "Arc chute", "Spring return"], answer: 2 },
-        { q: "Solid State Relay (SSR) berbeda dari Electromechanical Relay (EMR) karena SSR...", image: "", options: ["Hanya bisa digunakan untuk arus AC.", "Memiliki kontak tembaga yang lebih tebal.", "Bekerja menggunakan bimetal.", "Tidak memiliki komponen mekanik yang bergerak karena menggunakan semikonduktor.", "Membutuhkan tegangan kontrol ratusan volt."], answer: 3 },
-        { q: "Surge Arrester (SPD) dipasang pada panel distribusi berfungsi untuk...", image: "", options: ["Membatasi pemakaian daya harian.", "Melindungi motor listrik dari beban lebih.", "Menghilangkan getaran pada kontaktor.", "Memotong dan membuang lonjakan tegangan (surge) seperti akibat sambaran petir ke sistem pembumian (grounding).", "Menstabilkan arus listrik secara otomatis setiap saat."], answer: 3 },
-        { q: "Komponen utama di dalam Surge Arrester (SPD) yang hambatannya bisa turun drastis (menjadi konduktor) saat terkena tegangan kejut ekstrem adalah...", image: "", options: ["MOV (Metal Oxide Varistor)", "Shading Ring", "Bimetal", "Kontaktor Koil", "Triac"], answer: 0 },
-        { q: "Pada jendela indikator Surge Arrester (SPD), warna apa yang biasanya menunjukkan bahwa kartrid/modul SPD tersebut sudah rusak dan harus diganti?", image: "", options: ["Hijau", "Merah", "Biru", "Kuning", "Putih"], answer: 1 },
-        { q: "Surge Arrester (SPD) tipe apa yang idealnya dipasang pada panel distribusi utama (MDB) untuk menahan arus petir langsung dari luar ruangan?", image: "", options: ["Type 3 (Class D)", "Type 2 (Class C)", "Type 1 (Class B)", "SPD DC", "Thermal Arrester"], answer: 2 }
-    ];
-
-    Object.keys(defaultBankSoal).forEach(div => {
-        modulListWajib.forEach(modul => {
-            if(modul === "Evaluasi Komponen Panel") {
-                defaultBankSoal[div][modul] = [
-                    { q: "Perhatikan contoh gambar komponen instrumen berikut. Apakah nama tipe pengaman elektrikal tersebut?", image: "https://upload.wikimedia.org/wikipedia/commons/thumb/d/df/MCB_C16.jpg/320px-MCB_C16.jpg", options: ["MCB (Miniature Circuit Breaker)", "Relay AC/DC", "Kontaktor Magnetik", "TDR Timer Relay"], answer: 0 },
-                    ...soalKomponenPanelWord
-                ];
-            } else {
-                defaultBankSoal[div][modul] = [
-                    { q: `Berapakah batas ambang toleransi standar kelayakan pengujian awal pada modul [${modul}]?`, image: "", options: ["Kurang dari parameter", "Sesuai regulasi standar baku mutu PT. Tirta Teknosys", "Dibiarkan tanpa kalkulasi", "Bypass sirkuit manual"], answer: 1 }
-                ];
-            }
-        });
-    });
-
-    let activeBankSoal = defaultBankSoal;
     onValue(ref(db, 'bank_soal_cloud'), (snapshot) => {
         if(snapshot.exists()) { 
             activeBankSoal = snapshot.val(); 
             renderDaftarModulCMS(); 
             if(!document.getElementById('test-section').classList.contains('hidden')) triggerBlinkEffect();
-        } else { set(ref(db, 'bank_soal_cloud'), defaultBankSoal); }
-    });
-
-    function restoreDefaultBankSoal() {
-        if(confirm("Kembalikan sistem ke 6 modul elektrikal wajib (termasuk 12 Soal Panel asli dari dokumen Word Anda) di seluruh divisi?")) {
-            set(ref(db, 'bank_soal_cloud'), defaultBankSoal).then(() => { alert("Restorasi Berhasil!"); });
+        } else {
+            activeBankSoal = { "produksi": {}, "teknisi hospital": {}, "teknisi irescom": {}, "teknisi E-catalog": {} };
         }
-    }
+    });
 
     onValue(ref(db, 'materi_pembelajaran_cloud'), (snapshot) => {
         activeMateriCloud = snapshot.val() || {};
         if(!document.getElementById('materi-section').classList.contains('hidden')) { renderHalamanMateri(); triggerBlinkEffect(); }
         if(!document.getElementById('admin-section').classList.contains('hidden')) { renderDaftarMateriCMS(); }
+    });
+
+    onValue(ref(db, 'histori_soal_manual'), (snapshot) => {
+        historiSoalManual = snapshot.val() || {};
+        if(!document.getElementById('adm-view-histori-soal').classList.contains('hidden')) { renderHistoriSoalTable(); }
+    });
+
+    onValue(ref(db, 'histori_materi_manual'), (snapshot) => {
+        historiMateriManual = snapshot.val() || {};
+        if(!document.getElementById('adm-view-histori-materi').classList.contains('hidden')) { renderHistoriMateriTable(); }
+    });
+
+    onValue(ref(db, 'histori_csv_soal'), (snapshot) => {
+        historiCSVSoal = snapshot.val() || {};
+        if(!document.getElementById('adm-view-histori-csv').classList.contains('hidden')) { renderHistoriCSVSoalTable(); }
+    });
+
+    onValue(ref(db, 'histori_csv_materi'), (snapshot) => {
+        historiCSVMateri = snapshot.val() || {};
+        if(!document.getElementById('adm-view-histori-csv').classList.contains('hidden')) { renderHistoriCSVMateriTable(); }
     });
 
     setPersistence(auth, browserLocalPersistence).catch((error) => { console.error(error); });
@@ -801,12 +843,20 @@
     }
 
     function cekTokenDanMulai(mod) {
-        playClick(); let token = prompt("Masukkan Token Akses Ujian:");
+        playClick(); 
+        
+        let soalAsli = activeBankSoal[currentMainKategori] ? activeBankSoal[currentMainKategori][mod] : null;
+        if (!soalAsli || soalAsli.length === 0) { 
+            alert("Maaf, Modul ini kosong atau belum memiliki soal untuk diujikan."); 
+            return; 
+        }
+
+        let token = prompt("Masukkan Token Akses Ujian:");
         if(token !== appSettings.token) { alert("Akses Ditolak!"); return; }
         
         mulaiKeamanan(); document.getElementById('toggle-calc-btn').style.display = 'block';
         currentSubModul = mod; document.getElementById('test-title').innerText = mod;
-        let soalAsli = activeBankSoal[currentMainKategori][mod];
+        
         ujianSedangBerjalan = []; currentQuestionIndex = 0; pelanggaran = 0; isUjianAktif = true;
 
         soalAsli.forEach(s => {
@@ -882,11 +932,23 @@
     function gantiTabAdmin(tabId) {
         document.querySelectorAll('.admin-tab').forEach(t => t.classList.remove('active'));
         document.getElementById('tab-adm-' + tabId).classList.add('active');
-        document.getElementById('adm-view-data').classList.add('hidden'); document.getElementById('adm-view-chart').classList.add('hidden');
-        document.getElementById('adm-view-cms').classList.add('hidden'); document.getElementById('adm-view-settings').classList.add('hidden'); 
-        document.getElementById('adm-view-online').classList.add('hidden'); document.getElementById('adm-view-materi').classList.add('hidden');
+        document.getElementById('adm-view-data').classList.add('hidden'); 
+        document.getElementById('adm-view-chart').classList.add('hidden');
+        document.getElementById('adm-view-cms').classList.add('hidden'); 
+        document.getElementById('adm-view-settings').classList.add('hidden'); 
+        document.getElementById('adm-view-online').classList.add('hidden'); 
+        document.getElementById('adm-view-materi').classList.add('hidden');
+        document.getElementById('adm-view-histori-soal').classList.add('hidden'); 
+        document.getElementById('adm-view-histori-materi').classList.add('hidden');
+        document.getElementById('adm-view-histori-csv').classList.add('hidden');
+        
         document.getElementById('adm-view-' + tabId).classList.remove('hidden');
-        if(tabId === 'chart') renderChart(); if(tabId === 'cms') renderDaftarModulCMS(); if(tabId === 'materi') renderDaftarMateriCMS();
+        if(tabId === 'chart') renderChart(); 
+        if(tabId === 'cms') renderDaftarModulCMS(); 
+        if(tabId === 'materi') renderDaftarMateriCMS();
+        if(tabId === 'histori-soal') renderHistoriSoalTable();
+        if(tabId === 'histori-materi') renderHistoriMateriTable();
+        if(tabId === 'histori-csv') { renderHistoriCSVSoalTable(); renderHistoriCSVMateriTable(); }
     }
 
     function loginAdmin() { 
@@ -979,6 +1041,8 @@
 
     function editSatuSoal(kat, mod, idx) {
         const s = activeBankSoal[kat][mod][idx];
+        document.getElementById('cms-kategori').value = kat;
+        document.getElementById('cms-modul').value = mod;
         document.getElementById('cms-q').value = s.q;
         document.getElementById('cms-img').value = s.image || '';
         document.getElementById('cms-opt0').value = s.options[0];
@@ -988,12 +1052,18 @@
         document.getElementById('cms-ans').value = s.answer;
         
         editSoalIndex = idx;
+        editSoalBatchId = s.batchId || null; 
+        editSoalInternalId = s.internalId || null; 
+        editSoalOldKat = kat; 
+        editSoalOldMod = mod; 
+        
+        document.getElementById('cms-kategori').disabled = false; 
+        document.getElementById('cms-modul').disabled = false;
+
         document.getElementById('btn-simpan-soal').innerHTML = '<i class="fa-solid fa-save"></i> Update Soal';
         document.getElementById('btn-batal-edit-soal').classList.remove('hidden');
         
-        document.getElementById('cms-kategori').disabled = true;
-        document.getElementById('cms-modul').disabled = true;
-
+        gantiTabAdmin('cms');
         document.getElementById('adm-view-cms').scrollIntoView({behavior: "smooth"});
     }
 
@@ -1005,20 +1075,30 @@
         document.getElementById('cms-opt2').value = ''; 
         document.getElementById('cms-opt3').value = ''; 
         document.getElementById('cms-ans').value = '0';
-        editSoalIndex = -1;
-        document.getElementById('btn-simpan-soal').innerHTML = '<i class="fa-solid fa-upload"></i> Publikasi ke Cloud';
-        document.getElementById('btn-batal-edit-soal').classList.add('hidden');
         
+        editSoalIndex = -1;
+        editSoalBatchId = null;
+        editSoalInternalId = null;
+        editHistoriSoalId = null;
+        editSoalOldKat = null;
+        editSoalOldMod = null;
+
         document.getElementById('cms-kategori').disabled = false;
         document.getElementById('cms-modul').disabled = false;
+
+        document.getElementById('btn-simpan-soal').innerHTML = '<i class="fa-solid fa-upload"></i> Publikasi ke Cloud';
+        document.getElementById('btn-batal-edit-soal').classList.add('hidden');
     }
 
     function hapusSatuSoal(kat, mod, idx) { 
-        if (editSoalIndex !== -1) {
-            alert("Harap selesaikan atau tekan 'Batal Edit' terlebih dahulu sebelum menghapus soal!");
-            return;
-        }
         if(confirm("Hapus soal ini?")) { 
+            let s = activeBankSoal[kat][mod][idx];
+            
+            if(s.internalId) {
+                let histKey = Object.keys(historiSoalManual).find(k => historiSoalManual[k].internalId === s.internalId);
+                if (histKey) remove(ref(db, `histori_soal_manual/${histKey}`));
+            }
+
             activeBankSoal[kat][mod].splice(idx, 1); 
             set(ref(db, 'bank_soal_cloud'), activeBankSoal).then(() => { renderDaftarSoalCMS(); }); 
         } 
@@ -1032,17 +1112,146 @@
         if(!mod || !q || !opt[0] || !opt[1] || !opt[2] || !opt[3]) { alert("Isi form secara lengkap (Pastikan Modul terisi)!"); return; }
         if(!activeBankSoal[kat]) activeBankSoal[kat] = {}; if(!activeBankSoal[kat][mod]) activeBankSoal[kat][mod] = [];
         
-        if (editSoalIndex !== -1) {
-            activeBankSoal[kat][mod][editSoalIndex] = { q: q, image: img, options: opt, answer: ans };
+        let soalData = { q: q, image: img, options: opt, answer: ans };
+        
+        if (editSoalBatchId) {
+            soalData.batchId = editSoalBatchId;
+        } else if (editSoalInternalId) {
+            soalData.internalId = editSoalInternalId;
         } else {
-            activeBankSoal[kat][mod].push({ q: q, image: img, options: opt, answer: ans });
+            soalData.internalId = "manual_" + Date.now();
         }
 
-        set(ref(db, 'bank_soal_cloud'), activeBankSoal).then(() => { 
-            alert("Soal Cloud Diperbarui!"); 
-            batalEditSoal(); 
-            renderDaftarModulCMS();
-        });
+        if (editSoalIndex !== -1) {
+            if (editSoalOldKat === kat && editSoalOldMod === mod) {
+                activeBankSoal[kat][mod][editSoalIndex] = soalData;
+            } else {
+                activeBankSoal[editSoalOldKat][editSoalOldMod].splice(editSoalIndex, 1);
+                activeBankSoal[kat][mod].push(soalData);
+            }
+            
+            if (soalData.internalId) {
+                let histKey = Object.keys(historiSoalManual).find(k => historiSoalManual[k].internalId === soalData.internalId);
+                if (histKey) update(ref(db, `histori_soal_manual/${histKey}`), { divisi: kat, modul: mod, q: q, image: img, options: opt, answer: ans });
+            }
+
+            set(ref(db, 'bank_soal_cloud'), activeBankSoal).then(() => { 
+                alert("Soal Cloud Diperbarui!"); 
+                batalEditSoal(); 
+                renderDaftarModulCMS();
+            });
+
+        } else if (editHistoriSoalId !== null) {
+            let oldItem = historiSoalManual[editHistoriSoalId];
+            
+            if (oldItem && activeBankSoal[oldItem.divisi] && activeBankSoal[oldItem.divisi][oldItem.modul]) {
+                let idx = activeBankSoal[oldItem.divisi][oldItem.modul].findIndex(s => 
+                    (s.internalId && s.internalId === oldItem.internalId) || (!s.internalId && s.q === oldItem.q)
+                );
+                
+                if (idx !== -1) {
+                    if(oldItem.divisi === kat && oldItem.modul === mod) {
+                        activeBankSoal[kat][mod][idx] = soalData;
+                    } else {
+                        activeBankSoal[oldItem.divisi][oldItem.modul].splice(idx, 1);
+                        activeBankSoal[kat][mod].push(soalData);
+                    }
+                } else {
+                    activeBankSoal[kat][mod].push(soalData);
+                }
+            } else {
+                 activeBankSoal[kat][mod].push(soalData);
+            }
+            
+            set(ref(db, 'bank_soal_cloud'), activeBankSoal);
+            update(ref(db, `histori_soal_manual/${editHistoriSoalId}`), {
+                divisi: kat, modul: mod, q: q, image: img, options: opt, answer: ans, internalId: soalData.internalId
+            }).then(() => {
+                alert("Histori dan Soal Cloud telah diperbarui dan disinkronkan!");
+                batalEditSoal();
+                renderDaftarModulCMS();
+            });
+
+        } else {
+            activeBankSoal[kat][mod].push(soalData);
+            
+            push(ref(db, 'histori_soal_manual'), {
+                divisi: kat, modul: mod, q: q, image: img, options: opt, answer: ans, internalId: soalData.internalId,
+                waktu: new Date().toLocaleTimeString('id-ID') + " " + new Date().toLocaleDateString('id-ID')
+            });
+            set(ref(db, 'bank_soal_cloud'), activeBankSoal).then(() => { 
+                alert("Soal Baru berhasil ditambahkan ke Cloud!"); 
+                batalEditSoal(); 
+                renderDaftarModulCMS();
+            });
+        }
+    }
+
+    function renderHistoriSoalTable() {
+        const tbody = document.getElementById('admin-table-histori-soal');
+        tbody.innerHTML = '';
+        if(!historiSoalManual || Object.keys(historiSoalManual).length === 0) {
+            tbody.innerHTML = `<tr><td colspan="5" align="center">Belum ada histori soal manual.</td></tr>`;
+            return;
+        }
+        for(let key in historiSoalManual) {
+            let item = historiSoalManual[key];
+            tbody.innerHTML += `
+                <tr>
+                    <td><b>${item.divisi.toUpperCase()}</b></td>
+                    <td>${item.modul}</td>
+                    <td>${item.q}</td>
+                    <td style="font-size:10px; color:gray;">${item.waktu}</td>
+                    <td>
+                        <button onclick="editHistoriSoal('${key}')" style="background:var(--warning); color:white; border:none; padding:5px 8px; border-radius:5px; cursor:pointer; margin-right:5px;"><i class="fa-solid fa-pen"></i></button>
+                        <button onclick="hapusHistoriSoal('${key}')" style="background:var(--danger); color:white; border:none; padding:5px 8px; border-radius:5px; cursor:pointer;" title="Hapus Histori & Soal Cloud"><i class="fa-solid fa-trash"></i></button>
+                    </td>
+                </tr>`;
+        }
+    }
+
+    function editHistoriSoal(key) {
+        let item = historiSoalManual[key];
+        if(!item) return;
+        document.getElementById('cms-kategori').value = item.divisi;
+        document.getElementById('cms-modul').value = item.modul;
+        document.getElementById('cms-q').value = item.q;
+        document.getElementById('cms-img').value = item.image || '';
+        document.getElementById('cms-opt0').value = item.options[0];
+        document.getElementById('cms-opt1').value = item.options[1];
+        document.getElementById('cms-opt2').value = item.options[2];
+        document.getElementById('cms-opt3').value = item.options[3];
+        document.getElementById('cms-ans').value = item.answer;
+
+        editHistoriSoalId = key;
+
+        document.getElementById('cms-kategori').disabled = false;
+        document.getElementById('cms-modul').disabled = false;
+
+        document.getElementById('btn-simpan-soal').innerHTML = '<i class="fa-solid fa-save"></i> Simpan Editan Histori';
+        document.getElementById('btn-batal-edit-soal').classList.remove('hidden');
+
+        gantiTabAdmin('cms');
+        document.getElementById('adm-view-cms').scrollIntoView({behavior: "smooth"});
+    }
+
+    function hapusHistoriSoal(key) {
+        if(confirm("Hapus item ini? Soal aslinya juga akan ikut TERCABUT dari Bank Soal.")) {
+            let item = historiSoalManual[key];
+            if (item && activeBankSoal[item.divisi] && activeBankSoal[item.divisi][item.modul]) {
+                let idx = activeBankSoal[item.divisi][item.modul].findIndex(s => 
+                    (s.internalId && s.internalId === item.internalId) || (!s.internalId && s.q === item.q)
+                );
+                
+                if (idx !== -1) {
+                    activeBankSoal[item.divisi][item.modul].splice(idx, 1);
+                    set(ref(db, 'bank_soal_cloud'), activeBankSoal);
+                }
+            }
+            remove(ref(db, `histori_soal_manual/${key}`)).then(() => { 
+                alert("Histori dan Soal terkait berhasil dicabut dari server!"); 
+            });
+        }
     }
 
     function simpanMateriBaru() {
@@ -1052,14 +1261,44 @@
         if(!judul || konten === '<p><br></p>') { alert("Judul sub-materi dan konten wajib diisi!"); return; }
         
         if (editMateriKey !== null) {
-            const materiRef = ref(db, `materi_pembelajaran_cloud/${kat}/${editMateriKey}`);
-            update(materiRef, { judul: judul, konten: konten, image: img, video: vid }).then(() => {
-                alert(`Materi [${judul}] berhasil diupdate!`);
+            if (editMateriOldKat === kat) {
+                update(ref(db, `materi_pembelajaran_cloud/${kat}/${editMateriKey}`), { judul: judul, konten: konten, image: img, video: vid });
+            } else {
+                remove(ref(db, `materi_pembelajaran_cloud/${editMateriOldKat}/${editMateriKey}`));
+                set(ref(db, `materi_pembelajaran_cloud/${kat}/${editMateriKey}`), { judul: judul, konten: konten, image: img, video: vid });
+            }
+            
+            let histKey = Object.keys(historiMateriManual).find(k => historiMateriManual[k].cloudKey === editMateriKey);
+            if (histKey) {
+                update(ref(db, `histori_materi_manual/${histKey}`), { kategori: kat, judul: judul, konten: konten, image: img, video: vid });
+            }
+
+            alert(`Materi [${judul}] berhasil diupdate!`);
+            batalEditMateri();
+            
+        } else if (editHistoriMateriId !== null) {
+            let item = historiMateriManual[editHistoriMateriId];
+            if (item && item.cloudKey) {
+                if(item.kategori === kat) {
+                    update(ref(db, `materi_pembelajaran_cloud/${item.kategori}/${item.cloudKey}`), { judul: judul, konten: konten, image: img, video: vid });
+                } else {
+                    remove(ref(db, `materi_pembelajaran_cloud/${item.kategori}/${item.cloudKey}`));
+                    set(ref(db, `materi_pembelajaran_cloud/${kat}/${item.cloudKey}`), { judul: judul, konten: konten, image: img, video: vid });
+                }
+            }
+            update(ref(db, `histori_materi_manual/${editHistoriMateriId}`), {
+                kategori: kat, judul: judul, konten: konten, image: img, video: vid
+            }).then(() => {
+                alert("Histori dan Materi Server berhasil diperbarui!");
                 batalEditMateri();
             });
         } else {
             const materiRef = ref(db, `materi_pembelajaran_cloud/${kat}`);
-            push(materiRef, { judul: judul, konten: konten, image: img, video: vid }).then(() => {
+            push(materiRef, { judul: judul, konten: konten, image: img, video: vid }).then((newRef) => {
+                push(ref(db, 'histori_materi_manual'), {
+                    kategori: kat, judul: judul, konten: konten, image: img, video: vid, cloudKey: newRef.key, 
+                    waktu: new Date().toLocaleTimeString('id-ID') + " " + new Date().toLocaleDateString('id-ID')
+                });
                 alert(`Materi kategori [${kat}] berhasil ditambahkan!`);
                 batalEditMateri();
             });
@@ -1084,15 +1323,66 @@
         }
     }
 
-    function hapusMateriSpesifik(kategori, subKey) { 
-        if (editMateriKey !== null) {
-            alert("Harap selesaikan atau tekan 'Batal Edit' terlebih dahulu sebelum menghapus materi!");
+    function renderHistoriMateriTable() {
+        const tbody = document.getElementById('admin-table-histori-materi');
+        tbody.innerHTML = '';
+        if(!historiMateriManual || Object.keys(historiMateriManual).length === 0) {
+            tbody.innerHTML = `<tr><td colspan="4" align="center">Belum ada histori materi manual.</td></tr>`;
             return;
         }
+        for(let key in historiMateriManual) {
+            let item = historiMateriManual[key];
+            tbody.innerHTML += `
+                <tr>
+                    <td><b>${item.kategori}</b></td>
+                    <td>${item.judul}</td>
+                    <td style="font-size:10px; color:gray;">${item.waktu}</td>
+                    <td>
+                        <button onclick="editHistoriMateri('${key}')" style="background:var(--warning); color:white; border:none; padding:5px 8px; border-radius:5px; cursor:pointer; margin-right:5px;"><i class="fa-solid fa-pen"></i></button>
+                        <button onclick="hapusHistoriMateri('${key}')" style="background:var(--danger); color:white; border:none; padding:5px 8px; border-radius:5px; cursor:pointer;" title="Hapus Histori & Materi Cloud"><i class="fa-solid fa-trash"></i></button>
+                    </td>
+                </tr>`;
+        }
+    }
+
+    function editHistoriMateri(key) {
+        let item = historiMateriManual[key];
+        if(!item) return;
+        document.getElementById('cms-mat-kategori').value = item.kategori;
+        document.getElementById('cms-mat-judul').value = item.judul;
+        document.getElementById('cms-mat-img').value = item.image || '';
+        document.getElementById('cms-mat-vid').value = item.video || '';
+        quill.clipboard.dangerouslyPasteHTML(item.konten);
+
+        editHistoriMateriId = key;
+        document.getElementById('cms-mat-kategori').disabled = false;
+
+        document.getElementById('btn-simpan-materi').innerHTML = '<i class="fa-solid fa-save"></i> Update Histori Materi';
+        document.getElementById('btn-batal-edit-materi').classList.remove('hidden');
+
+        gantiTabAdmin('materi');
+        document.getElementById('adm-view-materi').scrollIntoView({behavior: "smooth"});
+    }
+
+    function hapusHistoriMateri(key) {
+        if(confirm("Hapus item ini? Materi aslinya juga akan ikut TERCABUT dari Server.")) {
+            let item = historiMateriManual[key];
+            if (item && item.cloudKey) {
+                remove(ref(db, `materi_pembelajaran_cloud/${item.kategori}/${item.cloudKey}`));
+            } else if (item) {
+                let targetKey = Object.keys(activeMateriCloud[item.kategori] || {}).find(k => activeMateriCloud[item.kategori][k].judul === item.judul);
+                if (targetKey) remove(ref(db, `materi_pembelajaran_cloud/${item.kategori}/${targetKey}`));
+            }
+            remove(ref(db, `histori_materi_manual/${key}`)).then(() => { alert("Histori dan Materi berhasil dicabut!"); });
+        }
+    }
+
+    function hapusMateriSpesifik(kategori, subKey) { 
         if(confirm("Hapus sub-materi ini dari Cloud?")) { 
-            remove(ref(db, `materi_pembelajaran_cloud/${kategori}/${subKey}`)).then(() => { 
-                renderDaftarMateriCMS(); 
-            }); 
+            let histKey = Object.keys(historiMateriManual).find(k => historiMateriManual[k].cloudKey === subKey);
+            if (histKey) remove(ref(db, `histori_materi_manual/${histKey}`));
+
+            remove(ref(db, `materi_pembelajaran_cloud/${kategori}/${subKey}`)).then(() => { renderDaftarMateriCMS(); }); 
         } 
     }
 
@@ -1106,11 +1396,13 @@
         quill.clipboard.dangerouslyPasteHTML(mat.konten); 
         
         editMateriKey = subKey;
+        editMateriOldKat = kategori; 
+        document.getElementById('cms-mat-kategori').disabled = false;
+
         document.getElementById('btn-simpan-materi').innerHTML = '<i class="fa-solid fa-save"></i> Update ';
         document.getElementById('btn-batal-edit-materi').classList.remove('hidden');
-        
-        document.getElementById('cms-mat-kategori').disabled = true;
 
+        gantiTabAdmin('materi');
         document.getElementById('adm-view-materi').scrollIntoView({behavior: "smooth"});
     }
 
@@ -1119,11 +1411,15 @@
         document.getElementById('cms-mat-img').value = ''; 
         document.getElementById('cms-mat-vid').value = ''; 
         quill.setContents([]); 
+        
         editMateriKey = null;
-        document.getElementById('btn-simpan-materi').innerHTML = '<i class="fa-solid fa-save"></i> Upload Materi ke Cloud';
-        document.getElementById('btn-batal-edit-materi').classList.add('hidden');
+        editMateriOldKat = null;
+        editHistoriMateriId = null;
         
         document.getElementById('cms-mat-kategori').disabled = false;
+
+        document.getElementById('btn-simpan-materi').innerHTML = '<i class="fa-solid fa-save"></i> Upload Materi ke Cloud';
+        document.getElementById('btn-batal-edit-materi').classList.add('hidden');
     }
 
     function simpanPengaturan() { const t = document.getElementById('set-token').value; const w = parseInt(document.getElementById('set-waktu').value); const p = document.getElementById('set-pin').value; if(t === '' || p === '' || isNaN(w) || w <= 0) { alert("Data tidak valid!"); return; } update(ref(db, 'app_settings'), { token: t, waktu: w, pin_admin: p }).then(() => { alert("Konfigurasi Cloud Sukses Terbuka!"); }); }
@@ -1133,40 +1429,85 @@
         const kat = document.getElementById('cms-kategori').value;
         const mod = document.getElementById('cms-modul').value;
 
+        if (!mod) { alert("Silakan Pilih atau Ketik Nama Modul di bagian atas terlebih dahulu!"); document.getElementById('cms-modul').focus(); return; }
         if (!fileInput.files.length) { alert("Pilih file CSV terlebih dahulu!"); return; }
-        if (!mod) { alert("Pilih atau ketik Nama Modul tujuan terlebih dahulu!"); return; }
         if(!confirm(`PERHATIAN:\nAnda akan menyuntikkan data Soal ke:\nDivisi: [${kat}]\nModul: [${mod}]\n\nApakah sudah benar?`)) return;
 
         const reader = new FileReader();
+        const fileName = fileInput.files[0].name;
+
         reader.onload = function(e) {
-            const rows = e.target.result.split('\n'); let soalBaru = [];
+            let text = e.target.result.replace(/^\uFEFF/, '');
             
-            function parseCSVRow(str) {
-                let arr = []; let quote = false; let col = '';
-                for (let i = 0; i < str.length; i++) {
-                    let cc = str[i], nc = str[i+1];
-                    if (cc === '"' && quote && nc === '"') { col += '"'; i++; continue; }
-                    if (cc === '"') { quote = !quote; continue; }
-                    if (cc === ',' && !quote) { arr.push(col.trim()); col = ''; continue; }
-                    col += cc;
+            let sample = text.substring(0, 1000);
+            const c = (sample.match(/,/g) || []).length;
+            const s = (sample.match(/;/g) || []).length;
+            const t = (sample.match(/\t/g) || []).length;
+            let delimiter = ',';
+            if (s > c && s > t) delimiter = ';';
+            else if (t > c && t > s) delimiter = '\t';
+
+            let rows = [];
+            let row = [];
+            let col = '';
+            let quote = false;
+            for (let i = 0; i < text.length; i++) {
+                let cc = text[i], nc = text[i+1];
+                if (cc === '"' && quote && nc === '"') { col += '"'; i++; continue; }
+                if (cc === '"') { quote = !quote; continue; }
+                if (cc === delimiter && !quote) { row.push(col.trim()); col = ''; continue; }
+                if ((cc === '\n' || cc === '\r') && !quote) {
+                    if (cc === '\r' && nc === '\n') i++; 
+                    row.push(col.trim());
+                    if (row.join('').trim() !== '') rows.push(row); 
+                    row = [];
+                    col = '';
+                    continue;
                 }
-                arr.push(col.trim()); return arr;
+                col += cc;
+            }
+            if (col !== '' || row.length > 0) {
+                row.push(col.trim());
+                if (row.join('').trim() !== '') rows.push(row);
             }
 
-            for (let i = 1; i < rows.length; i++) {
-                if(rows[i].trim() === '') continue;
-                const cols = parseCSVRow(rows[i]); 
+            let soalBaru = [];
+            let batchId = "csv_soal_" + Date.now();
+
+            for (let i = 0; i < rows.length; i++) {
+                const cols = rows[i]; 
                 if (cols.length >= 7) {
-                    const q = cols[0]; const img = cols[1]; const opt0 = cols[2]; const opt1 = cols[3]; const opt2 = cols[4]; const opt3 = cols[5]; const ans = parseInt(cols[6]);
-                    if (q !== "" && !isNaN(ans)) soalBaru.push({ q: q, image: img === '-' || img === '' ? '' : img, options: [opt0, opt1, opt2, opt3], answer: ans });
+                    const q = cols[0]; 
+                    const img = cols[1]; 
+                    const opt0 = cols[2]; 
+                    const opt1 = cols[3]; 
+                    const opt2 = cols[4]; 
+                    const opt3 = cols[5]; 
+                    const ans = parseInt(cols[6]);
+                    
+                    if (q !== "" && !isNaN(ans)) {
+                        soalBaru.push({ batchId: batchId, q: q, image: img === '-' || img === '' ? '' : img, options: [opt0, opt1, opt2, opt3], answer: ans });
+                    }
                 }
             }
 
             if (soalBaru.length > 0) {
                 if (!activeBankSoal[kat]) activeBankSoal[kat] = {}; if (!activeBankSoal[kat][mod]) activeBankSoal[kat][mod] = [];
                 activeBankSoal[kat][mod] = activeBankSoal[kat][mod].concat(soalBaru);
-                set(ref(db, 'bank_soal_cloud'), activeBankSoal).then(() => { alert(`Berhasil mengimpor ${soalBaru.length} soal!`); fileInput.value = ''; renderDaftarModulCMS(); });
-            } else { alert("Gagal. Pastikan format CSV sesuai (7 Kolom Data)."); }
+                
+                push(ref(db, 'histori_csv_soal'), {
+                    batchId: batchId, fileName: fileName, divisi: kat, modul: mod, jumlah: soalBaru.length,
+                    waktu: new Date().toLocaleTimeString('id-ID') + " " + new Date().toLocaleDateString('id-ID')
+                });
+
+                set(ref(db, 'bank_soal_cloud'), activeBankSoal).then(() => { 
+                    alert(`Berhasil mengimpor ${soalBaru.length} soal!`); 
+                    fileInput.value = ''; 
+                    renderDaftarModulCMS(); 
+                });
+            } else { 
+                alert(`Gagal. Pastikan format CSV sesuai (7 Kolom Data).\nSistem mendeteksi pemisah: [ ${delimiter} ]\nTotal baris terbaca: ${rows.length}\nFormat Kolom: Pertanyaan, Image, OpsiA, OpsiB, OpsiC, OpsiD, IndexKunciJawaban(0-3)`); 
+            }
         };
         reader.readAsText(fileInput.files[0]);
     }
@@ -1174,42 +1515,167 @@
     function importCSVMateri() {
         const fileInput = document.getElementById('cms-csv-materi');
         const kat = document.getElementById('cms-mat-kategori').value;
-        if (!fileInput.files.length) { alert("Pilih file CSV Materi!"); return; }
+        if (!fileInput.files.length) { alert("Pilih file CSV Materi terlebih dahulu!"); return; }
         if(!confirm(`PERHATIAN:\nAnda akan menyuntikkan data Materi ke Kategori: [${kat}]\n\nApakah sudah benar?`)) return;
 
         const reader = new FileReader();
-        reader.onload = function(e) {
-            const rows = e.target.result.split('\n'); let successCount = 0;
-            function parseCSVRow(str) {
-                let arr = []; let quote = false; let col = '';
-                for (let i = 0; i < str.length; i++) {
-                    let cc = str[i], nc = str[i+1];
-                    if (cc === '"' && quote && nc === '"') { col += '"'; i++; continue; }
-                    if (cc === '"') { quote = !quote; continue; }
-                    if (cc === ',' && !quote) { arr.push(col.trim()); col = ''; continue; }
-                    col += cc;
-                }
-                arr.push(col.trim()); return arr;
-            }
+        const fileName = fileInput.files[0].name;
 
-            for (let i = 1; i < rows.length; i++) {
-                if(rows[i].trim() === '') continue;
-                const cols = parseCSVRow(rows[i]);
+        reader.onload = function(e) {
+            let text = e.target.result.replace(/^\uFEFF/, ''); 
+            
+            let sample = text.substring(0, 1000);
+            const c = (sample.match(/,/g) || []).length;
+            const s = (sample.match(/;/g) || []).length;
+            const t = (sample.match(/\t/g) || []).length;
+            let delimiter = ',';
+            if (s > c && s > t) delimiter = ';';
+            else if (t > c && t > s) delimiter = '\t';
+
+            let rows = []; let row = []; let col = ''; let quote = false;
+            for (let i = 0; i < text.length; i++) {
+                let cc = text[i], nc = text[i+1];
+                if (cc === '"' && quote && nc === '"') { col += '"'; i++; continue; }
+                if (cc === '"') { quote = !quote; continue; }
+                if (cc === delimiter && !quote) { row.push(col.trim()); col = ''; continue; }
+                if ((cc === '\n' || cc === '\r') && !quote) {
+                    if (cc === '\r' && nc === '\n') i++; 
+                    row.push(col.trim());
+                    if (row.join('').trim() !== '') rows.push(row);
+                    row = []; col = ''; continue;
+                }
+                col += cc;
+            }
+            if (col !== '' || row.length > 0) {
+                row.push(col.trim());
+                if (row.join('').trim() !== '') rows.push(row);
+            }
+            
+            let successCount = 0;
+            let batchId = "csv_mat_" + Date.now();
+            let newKeys = [];
+
+            for (let i = 0; i < rows.length; i++) {
+                const cols = rows[i];
                 if (cols.length >= 2) {
                     const judul = cols[0]; const konten = cols[1]; const img = cols[2] ? cols[2] : ''; const vid = cols[3] ? cols[3] : '';
+                    if (i === 0 && (judul.toLowerCase().includes('judul') || konten.toLowerCase().includes('konten'))) continue; 
+                    
                     if (judul !== "" && konten !== "") {
-                        push(ref(db, `materi_pembelajaran_cloud/${kat}`), { judul: judul, konten: konten, image: img === '-' || img === '' ? '' : img, video: vid === '-' || vid === '' ? '' : vid });
+                        let newRef = push(ref(db, `materi_pembelajaran_cloud/${kat}`), { judul: judul, konten: konten, image: img === '-' || img === '' ? '' : img, video: vid === '-' || vid === '' ? '' : vid });
+                        newKeys.push(newRef.key);
                         successCount++;
                     }
                 }
             }
-            if (successCount > 0) { alert(`Berhasil mengimpor ${successCount} materi!`); fileInput.value = ''; } 
-            else { alert("Gagal membaca materi. Cek format CSV."); }
+            
+            if (successCount > 0) { 
+                push(ref(db, 'histori_csv_materi'), {
+                    batchId: batchId, fileName: fileName, kategori: kat, jumlah: successCount, keys: newKeys,
+                    waktu: new Date().toLocaleTimeString('id-ID') + " " + new Date().toLocaleDateString('id-ID')
+                });
+                alert(`Berhasil mengimpor ${successCount} materi!`); 
+                fileInput.value = ''; 
+            } else { 
+                alert(`Gagal membaca materi. Cek format CSV (Pemisah terdeteksi: [ ${delimiter} ]).`); 
+            }
         };
         reader.readAsText(fileInput.files[0]);
     }
 
-    Object.assign(window, { toggleTheme, playClick, toggleCalc, calcInput, calcClear, calcEval, gantiTabAuth, prosesAuth, loginGoogle, loginAdmin, keluarAdmin, keluarSistem, showSection, bukaSubKategori, cekTokenDanMulai, navigasiSoal, toggleRagu, konfirmasiSubmit, submitTest, hapusSemuaData, hapusSatuKandidat, lompatSoal, gantiTabAdmin, eksporCSV, simpanSoalBaru, hapusSatuSoal, simpanPengaturan, restoreDefaultBankSoal, renderDaftarModulCMS, renderDaftarSoalCMS, bukaHalamanMateri, bukaDaftarSubMateri, simpanMateriBaru, hapusMateriSpesifik, importCSVSoal, importCSVMateri, editSatuSoal, batalEditSoal, editMateriSpesifik, batalEditMateri });
+    function renderHistoriCSVSoalTable() {
+        const tbody = document.getElementById('admin-table-histori-csv-soal');
+        tbody.innerHTML = '';
+        if(!historiCSVSoal || Object.keys(historiCSVSoal).length === 0) {
+            tbody.innerHTML = `<tr><td colspan="5" align="center">Belum ada histori upload CSV.</td></tr>`;
+            return;
+        }
+        for(let key in historiCSVSoal) {
+            let item = historiCSVSoal[key];
+            tbody.innerHTML += `
+                <tr>
+                    <td><b>${item.fileName}</b></td>
+                    <td>${item.divisi.toUpperCase()} <br><span style="font-size:10px; color:var(--primary);">${item.modul}</span></td>
+                    <td><b>${item.jumlah}</b> Soal</td>
+                    <td style="font-size:10px; color:gray;">${item.waktu}</td>
+                    <td>
+                        <button onclick="hapusHistoriCSVSoal('${key}', '${item.batchId}')" style="background:var(--danger); color:white; border:none; padding:5px 8px; border-radius:5px; cursor:pointer;" title="Hapus File & Soal"><i class="fa-solid fa-trash"></i></button>
+                    </td>
+                </tr>`;
+        }
+    }
+
+    function hapusHistoriCSVSoal(key, batchId) {
+        if(confirm("Batalkan import CSV ini? Seluruh soal dari file CSV tersebut akan DIBERSIHKAN dari Bank Soal.")) {
+            for (let k in activeBankSoal) {
+                for (let m in activeBankSoal[k]) {
+                    if (activeBankSoal[k][m]) {
+                        activeBankSoal[k][m] = activeBankSoal[k][m].filter(s => s.batchId !== batchId);
+                    }
+                }
+            }
+            set(ref(db, 'bank_soal_cloud'), activeBankSoal).then(() => {
+                remove(ref(db, `histori_csv_soal/${key}`));
+                alert("Import file CSV berhasil dibatalkan dan seluruh Soalnya tercabut dari cloud!");
+                renderDaftarModulCMS();
+            });
+        }
+    }
+
+    function renderHistoriCSVMateriTable() {
+        const tbody = document.getElementById('admin-table-histori-csv-materi');
+        tbody.innerHTML = '';
+        if(!historiCSVMateri || Object.keys(historiCSVMateri).length === 0) {
+            tbody.innerHTML = `<tr><td colspan="5" align="center">Belum ada histori upload CSV.</td></tr>`;
+            return;
+        }
+        for(let key in historiCSVMateri) {
+            let item = historiCSVMateri[key];
+            let keysString = JSON.stringify(item.keys).replace(/"/g, '&quot;');
+            tbody.innerHTML += `
+                <tr>
+                    <td><b>${item.fileName}</b></td>
+                    <td>${item.kategori}</td>
+                    <td><b>${item.jumlah}</b> Materi</td>
+                    <td style="font-size:10px; color:gray;">${item.waktu}</td>
+                    <td>
+                        <button onclick="hapusHistoriCSVMateri('${key}', '${keysString}')" style="background:var(--danger); color:white; border:none; padding:5px 8px; border-radius:5px; cursor:pointer;" title="Hapus File & Materi"><i class="fa-solid fa-trash"></i></button>
+                    </td>
+                </tr>`;
+        }
+    }
+
+    function hapusHistoriCSVMateri(key, keysString) {
+        if(confirm("Batalkan import CSV ini? Seluruh materi dari file CSV tersebut akan DIBERSIHKAN dari cloud.")) {
+            let keys = JSON.parse(keysString.replace(/&quot;/g, '"'));
+            let updates = {};
+            
+            for (let category in activeMateriCloud) {
+                keys.forEach(k => {
+                    if (activeMateriCloud[category] && activeMateriCloud[category][k]) {
+                        updates[`materi_pembelajaran_cloud/${category}/${k}`] = null;
+                    }
+                });
+            }
+            
+            if (Object.keys(updates).length === 0) {
+                remove(ref(db, `histori_csv_materi/${key}`));
+                alert("Data histori CSV berhasil dihapus (Materi sudah kosong di cloud).");
+                return;
+            }
+            
+            update(ref(db), updates).then(() => {
+                remove(ref(db, `histori_csv_materi/${key}`));
+                alert("Import file CSV berhasil dibatalkan dan seluruh Materinya tercabut dari cloud!");
+            });
+        }
+    }
+
+    Object.assign(window, { 
+        toggleTheme, playClick, toggleCalc, calcInput, calcClear, calcEval, gantiTabAuth, prosesAuth, loginGoogle, loginAdmin, keluarAdmin, keluarSistem, showSection, bukaSubKategori, cekTokenDanMulai, navigasiSoal, toggleRagu, konfirmasiSubmit, submitTest, hapusSemuaData, hapusSatuKandidat, lompatSoal, gantiTabAdmin, eksporCSV, simpanSoalBaru, hapusSatuSoal, simpanPengaturan, renderDaftarModulCMS, renderDaftarSoalCMS, bukaHalamanMateri, bukaDaftarSubMateri, simpanMateriBaru, hapusMateriSpesifik, importCSVSoal, importCSVMateri, editSatuSoal, batalEditSoal, editMateriSpesifik, batalEditMateri,
+        renderHistoriSoalTable, editHistoriSoal, hapusHistoriSoal, renderHistoriMateriTable, editHistoriMateri, hapusHistoriMateri,
+        hapusHistoriCSVSoal, hapusHistoriCSVMateri
+    });
     
 </script>
 </body>
