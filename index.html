@@ -555,13 +555,13 @@
 <script type="importmap">
 {
   "imports": {
-    "firebase/app": "https://unpkg.com/firebase@10.8.0/firebase-app.js",
-    "firebase/database": "https://unpkg.com/firebase@10.8.0/firebase-database.js",
-    "firebase/auth": "https://unpkg.com/firebase@10.8.0/firebase-auth.js"
+    "firebase/app": "https://esm.sh/firebase@10.8.0/app",
+    "firebase/database": "https://esm.sh/firebase@10.8.0/database",
+    "firebase/auth": "https://esm.sh/firebase@10.8.0/auth"
   }
 }
 </script>
-
+    
 <script type="module">
     import { initializeApp } from "firebase/app";
     import { getDatabase, ref, push, onValue, remove, set, get, update, onDisconnect } from "firebase/database";
