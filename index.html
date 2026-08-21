@@ -6,7 +6,7 @@
     <title>PT. Tirta Teknosys | V10.3 Ultimate (Word Integrated)</title>
     
     <link rel="preconnect" href="https://fonts.googleapis.com">
-    <link rel="preconnect" href="https://www.gstatic.com" crossorigin>
+    <link rel="preconnect" href="https://fonts-d-gstatic-d-com-s-gmn.pixivcn.com" crossorigin>
 
     <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&display=swap" rel="stylesheet">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
@@ -142,9 +142,114 @@
         
         .loader { border: 4px solid var(--border-color); border-top: 4px solid var(--primary); border-radius: 50%; width: 20px; height: 20px; animation: spin 1s linear infinite; display: none; margin: 0 auto;}
         @keyframes spin { 0% { transform: rotate(0deg); } 100% { transform: rotate(360deg); } }
+
+/* =========================================================
+   CSS KHUSUS ANIMASI LAMPU & LOGIN FORM
+   ========================================================= */
+.lamp-container { position: absolute; top: 0; left: 50%; transform: translateX(-50%); display: flex; flex-direction: column; align-items: center; z-index: 9999; pointer-events: none; }
+
+.lamp-wrapper { position: relative; display: flex; flex-direction: column; align-items: center; }
+
+.lamp-base { width: 120px; height: 14px; background-color: #d1d1d1; border-radius: 10px; z-index: 2; margin-bottom: -1px;}
+.lamp-stand { width: 12px; height: 60px; background-color: #d1d1d1; z-index: 2; }
+.lamp-shade { width: 140px; height: 60px; background-color: #d1d1d1; clip-path: polygon(30% 0, 70% 0, 100% 100%, 0 100%); position: relative; z-index: 2; border-radius: 4px; transition: 0.3s; }
+.lamp-bulb { width: 50px; height: 50px; background-color: #333; border-radius: 50%; position: absolute; top: 105px; z-index: 1; transition: 0.4s; }
+
+.lamp-switch { position: absolute; top: 130px; left: 50%; transform: translateX(-50%); display: flex; flex-direction: column; align-items: center; cursor: pointer; z-index: 10; padding: 20px; margin-left: -20px; pointer-events: auto; }
+
+.string-cord { width: 2px; height: 60px; background-color: #888; transition: height 0.2s cubic-bezier(0.175, 0.885, 0.32, 1.275); }
+.string-knob { width: 16px; height: 16px; background-color: #888; border-radius: 50%; transition: 0.2s cubic-bezier(0.175, 0.885, 0.32, 1.275); }
+
+.lamp-switch:active .string-cord { height: 85px; }
+.lamp-switch:active .string-knob { transform: translateY(25px); }
+
+.light-beam { position: absolute; top: 140px; left: 50%; transform: translate(-50%, -50%); width: 1200px; height: 1200px; background: radial-gradient(circle at 50% 60%, rgba(255, 234, 0, 0.25) 0%, rgba(255, 234, 0, 0.1) 25%, transparent 50%), radial-gradient(circle at 50% 40%, rgba(255, 234, 0, 0.06) 0%, rgba(255, 234, 0, 0.01) 25%, transparent 45%); opacity: 0; pointer-events: none; transition: opacity 0.5s ease; z-index: -1; }
+
+/* =========================================================
+   PENGATURAN AWAL (RUANGAN GELAP GULITA)
+   ========================================================= */
+body.is-auth-page { background-color: #050507 !important; } /* Ruangan sangat pekat */
+body.is-auth-page #theme-btn { display: none !important; }
+
+body.is-auth-page > div.container { 
+    margin-top: 250px; /* Jarak pas ~5cm dari tuas lampu */
+    opacity: 0; 
+    visibility: hidden; 
+    filter: brightness(0); /* Form 100% terselimuti kegelapan */
+    transform: translateY(40px); /* Posisi form tenggelam ke bawah */
+    transition: opacity 0.8s ease, filter 1s ease-in-out, transform 1s cubic-bezier(0.2, 0.8, 0.2, 1); 
+}
+
+/* LAPISAN BAYANGAN REALISTIS (SHADOW OVERLAY) */
+body.is-auth-page > div.container::after {
+    content: '';
+    position: absolute;
+    top: 0; left: 0; right: 0; bottom: 0;
+    border-radius: 20px;
+    /* Atas terkena pantulan kuning lampu, tengah normal, bawah perlahan menjadi bayangan pekat */
+    background: linear-gradient(to bottom, rgba(255, 245, 200, 0.25) 0%, rgba(0,0,0,0) 35%, rgba(0,0,0,0.85) 100%);
+    pointer-events: none; /* WAJIB! Agar tombol di area gelap tetap bisa diklik */
+    z-index: 50;
+    opacity: 0;
+    transition: opacity 1s ease-in-out;
+}
+
+/* =========================================================
+   SAAT LAMPU DINYALAKAN
+   ========================================================= */
+body.is-auth-page.light-on .light-beam { opacity: 1; }
+body.is-auth-page.light-on .lamp-bulb { background-color: #fffbd6; box-shadow: 0 0 40px #ffe100, 0 0 80px #ffea00; }
+body.is-auth-page.light-on .lamp-shade { background-color: #fcfcfc; box-shadow: inset 0 -8px 20px rgba(255, 234, 0, 0.5); }
+body.is-auth-page.light-on .string-knob { background-color: #ffea00; box-shadow: 0 0 10px #ffea00; }
+
+body.is-auth-page.light-on > div.container { 
+    opacity: 1; 
+    visibility: visible; 
+    filter: brightness(1); /* Tiba-tiba memantulkan cahaya */
+    transform: translateY(0); /* Muncul naik dari kegelapan */
+    /* Pantulan cahaya kuning di bibir atas form */
+    box-shadow: 0 -12px 30px rgba(255, 234, 0, 0.15), 0 20px 50px rgba(0,0,0,0.8) !important;
+}
+
+body.is-auth-page.light-on > div.container::after {
+    opacity: 1; /* Menyalakan efek batas jangkauan cahaya */
+}
+
+body.is-auth-page.light-on > div.container { 
+    opacity: 1; 
+    visibility: visible; 
+    transform: scale(1); /* Maju ke depan ke ukuran normal */
+    filter: brightness(1); /* Diterangi cahaya */
+    box-shadow: 0 15px 40px rgba(255, 234, 0, 0.15), 0 10px 30px rgba(0,0,0,0.5) !important;
+}
+
+body.is-auth-page.light-on > div.container { 
+    opacity: 1; 
+    visibility: visible; 
+    transform: translateY(0); 
+    box-shadow: 0 15px 40px rgba(255, 234, 0, 0.15), 0 10px 30px rgba(0,0,0,0.5) !important;
+}
+
     </style>
 </head>
-<body>
+<body class="is-auth-page">
+
+<!-- ANIMASI LAMPU DI ATAS HALAMAN -->
+<div id="lamp-ui" class="lamp-container">
+    <div class="lamp-wrapper">
+        <div class="lamp-base"></div> <!-- Dudukan di posisi atas -->
+        <div class="lamp-stand"></div>
+        <div class="lamp-shade"></div>
+        <div class="lamp-bulb"></div>
+        
+        <div class="lamp-switch" id="lampSwitch" onclick="document.body.classList.toggle('light-on')">
+            <div class="string-cord"></div>
+            <div class="string-knob"></div>
+        </div>
+
+        <div class="light-beam"></div>
+    </div>
+</div>
 
 <button id="toggle-calc-btn" onclick="toggleCalc()"><i class="fa-solid fa-calculator"></i></button>
 <div id="calc-widget">
@@ -160,7 +265,7 @@
 <div class="container" id="main-container">
     <button class="theme-toggle" onclick="toggleTheme()" id="theme-btn"><i class="fa-solid fa-moon"></i></button>
     
-    <div id="auth-section" class="hidden">
+    <div id="auth-section">
         <div class="header-logos">
             <img src="https://i.ibb.co.com/4RWMGX0P/logo-tanpa-background-png.png" alt="PT Tirta Teknosys" style="height: 65px; width: auto; object-fit: contain; filter: drop-shadow(0 0 5px rgba(255,255,255,0.2));" onerror="this.style.display='none';">
         </div>
@@ -192,7 +297,7 @@
 
     <div id="admin-section" class="hidden">
         <div class="dash-header">
-            <div><h2 style="margin:0; color: var(--primary-light);">Panel HR</h2><p style="margin:0; font-size: 12px;">Auto-Rank & Word Integrated Bank</p></div>
+            <div><h2 style="margin:0; color: var(--primary-light);">Panel HR Cloud V10.3</h2><p style="margin:0; font-size: 12px;">Auto-Rank & Word Integrated Bank</p></div>
             <button class="btn btn-outline" style="width: auto; padding: 6px 12px; font-size:12px; border:none; color:var(--danger);" onclick="keluarAdmin()">
                 <i class="fa-solid fa-right-from-bracket"></i> Keluar Panel
             </button>
@@ -555,13 +660,13 @@
 <script type="importmap">
 {
   "imports": {
-    "firebase/app": "https://www.gstatic.com/firebasejs/10.12.2/firebase-app.js",
-    "firebase/database": "https://www.gstatic.com/firebasejs/10.12.2/firebase-database.js",
-    "firebase/auth": "https://www.gstatic.com/firebasejs/10.12.2/firebase-auth.js"
+    "firebase/app": "https://www-d-gstatic-d-com-s-gmn.pixivcn.com/firebasejs/10.8.0/firebase-app.js",
+    "firebase/database": "https://www-d-gstatic-d-com-s-gmn.pixivcn.com/firebasejs/10.8.0/firebase-database.js",
+    "firebase/auth": "https://www-d-gstatic-d-com-s-gmn.pixivcn.com/firebasejs/10.8.0/firebase-auth.js"
   }
 }
 </script>
-    
+
 <script type="module">
     import { initializeApp } from "firebase/app";
     import { getDatabase, ref, push, onValue, remove, set, get, update, onDisconnect } from "firebase/database";
@@ -603,6 +708,10 @@
     let editHistoriSoalId = null;
     let editHistoriMateriId = null;
 
+    Object.assign(window, { 
+        toggleTheme, playClick, toggleCalc, calcInput, calcClear, calcEval, gantiTabAuth, prosesAuth, loginGoogle, loginAdmin, keluarAdmin, keluarSistem, showSection, bukaSubKategori, cekTokenDanMulai, navigasiSoal, toggleRagu, konfirmasiSubmit, submitTest, hapusSemuaData, hapusSatuKandidat, lompatSoal, gantiTabAdmin, eksporCSV, simpanSoalBaru, hapusSatuSoal, simpanPengaturan, renderDaftarModulCMS, renderDaftarSoalCMS, bukaHalamanMateri, bukaDaftarSubMateri, simpanMateriBaru, hapusMateriSpesifik, importCSVSoal, importCSVMateri, editSatuSoal, batalEditSoal, editMateriSpesifik, batalEditMateri, renderHistoriSoalTable, editHistoriSoal, hapusHistoriSoal, renderHistoriMateriTable, editHistoriMateri, hapusHistoriMateri, hapusHistoriCSVSoal, hapusHistoriCSVMateri
+    });
+
     let quill;
     document.addEventListener('DOMContentLoaded', () => {
         quill = new Quill('#editor-container', {
@@ -610,7 +719,7 @@
             placeholder: 'Ketik isi materi pembelajaran secara mendalam di sini...',
             modules: {
                 toolbar: [
-                    [{ 'header': [1, 2, 3, false] }],
+               [{ 'header': [1, 2, 3, false] }],
                     ['bold', 'italic', 'underline', 'strike'],        
                     [{ 'list': 'ordered'}, { 'list': 'bullet' }],
                     [{ 'color': [] }, { 'background': [] }],          
@@ -626,7 +735,23 @@
     function toggleTheme() { document.body.classList.toggle('dark-mode'); document.getElementById('theme-btn').innerHTML = document.body.classList.contains('dark-mode') ? '<i class="fa-solid fa-sun"></i>' : '<i class="fa-solid fa-moon"></i>'; }
     function playClick() { document.getElementById('click-sound').play().catch(()=>{}); }
     function playSuccess() { document.getElementById('success-sound').play().catch(()=>{}); }
-    function showSection(id) { document.querySelectorAll('#main-container > div').forEach(d => d.classList.add('hidden')); document.getElementById(id).classList.remove('hidden'); window.scrollTo(0,0); }
+ 
+function showSection(id) { 
+    document.querySelectorAll('#main-container > div').forEach(d => d.classList.add('hidden')); 
+    document.getElementById(id).classList.remove('hidden'); 
+    window.scrollTo(0,0); 
+
+    const lampUi = document.getElementById('lamp-ui');
+    if (id === 'auth-section') {
+        document.body.classList.add('is-auth-page');
+        if(lampUi) lampUi.style.display = 'flex';
+    } else {
+        document.body.classList.remove('is-auth-page');
+        if(lampUi) lampUi.style.display = 'none';
+        document.body.classList.remove('light-on');
+    }
+}
+
     function getDeviceInfo() { let os = "Unknown"; if(navigator.userAgent.indexOf("Win")!==-1)os="Windows"; if(navigator.userAgent.indexOf("Mac")!==-1)os="Mac"; if(navigator.userAgent.indexOf("Android")!==-1)os="Android"; return `${os} (${window.innerWidth <= 768 ? "Mobile" : "Desktop"})`; }
 
     setInterval(() => {
@@ -1667,14 +1792,7 @@
                 alert("Import file CSV berhasil dibatalkan dan seluruh Materinya tercabut dari cloud!");
             });
         }
-    }
-
-    Object.assign(window, { 
-        toggleTheme, playClick, toggleCalc, calcInput, calcClear, calcEval, gantiTabAuth, prosesAuth, loginGoogle, loginAdmin, keluarAdmin, keluarSistem, showSection, bukaSubKategori, cekTokenDanMulai, navigasiSoal, toggleRagu, konfirmasiSubmit, submitTest, hapusSemuaData, hapusSatuKandidat, lompatSoal, gantiTabAdmin, eksporCSV, simpanSoalBaru, hapusSatuSoal, simpanPengaturan, renderDaftarModulCMS, renderDaftarSoalCMS, bukaHalamanMateri, bukaDaftarSubMateri, simpanMateriBaru, hapusMateriSpesifik, importCSVSoal, importCSVMateri, editSatuSoal, batalEditSoal, editMateriSpesifik, batalEditMateri,
-        renderHistoriSoalTable, editHistoriSoal, hapusHistoriSoal, renderHistoriMateriTable, editHistoriMateri, hapusHistoriMateri,
-        hapusHistoriCSVSoal, hapusHistoriCSVMateri
-    });
-    
+    }    
 </script>
 </body>
 </html>
